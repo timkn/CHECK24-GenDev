@@ -25,6 +25,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@fontsource/poppins": "^5.0.1"
+		"@fontsource/poppins": "^5.0.1",
+		"svelte-material-ui": "^7.0.0-beta.8"
 	}
 }
