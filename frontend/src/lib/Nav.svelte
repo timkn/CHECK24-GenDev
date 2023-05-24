@@ -4,17 +4,16 @@
 
 
   nav
-      display: flex
-      justify-content: center
-      margin: 2rem
+    display: flex
+    justify-content: center
+    margin: 2rem
 
-    h1
-      color: colors.$blue
-      font-family: Poppins
-      font-size: 2rem
+  h1
+    color: colors.$blue
+    font-family: Poppins
+    font-size: 2rem
 
 </style>
-
 
 
 <nav>
