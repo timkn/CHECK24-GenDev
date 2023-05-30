@@ -3,16 +3,16 @@ from pydantic import BaseModel
 
 
 class HotelBase(BaseModel):
-    id: int
+    hotel_id: int
     name: str
     stars: int
-
 
 class HotelCreate(HotelBase):
     pass
 
-
 class Hotel(HotelBase):
+    id: int
+
     class Config:
         orm_mode = True
 
@@ -34,10 +34,8 @@ class OfferBase(BaseModel):
     oceanview: bool
     roomtype: str
 
-
 class OfferCreate(OfferBase):
     pass
-
 
 class Offer(OfferBase):
     id: int

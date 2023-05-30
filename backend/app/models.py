@@ -7,6 +7,7 @@ from app.database import Base
 class Hotel(Base):
     __tablename__ = 'hotels'
     id = Column(Integer, primary_key=True)
+    hotel_id = Column(Integer)
     name = Column(String)
     stars = Column(Integer)
 
@@ -14,7 +15,7 @@ class Hotel(Base):
 class Offer(Base):
     __tablename__ = 'offers'
     id = Column(Integer, primary_key=True)
-    hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    hotel_id = Column(Integer, ForeignKey('hotels.hotel_id'))
     outbounddeparturedatetime = Column(DateTime)
     inbounddeparturedatetime = Column(DateTime)
     countadults = Column(Integer)
