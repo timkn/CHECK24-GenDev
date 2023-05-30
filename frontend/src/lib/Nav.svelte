@@ -5,7 +5,7 @@
         display: flex;
         justify-content: center;
         background-color: #07102e;
-
+        padding: 1rem;
 
     }
 
@@ -13,6 +13,7 @@
         color: #fefff9;
         font-family: Poppins;
         font-size: 2rem;
+
 
     }
 
