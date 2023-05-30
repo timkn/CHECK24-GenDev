@@ -1,18 +1,27 @@
 import openai
-openai.api_key = "sk-..."  # supply your API key however you choose
+import os
 
-completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
-print(completion.choices[0].message.content)
+openai.api_key = os.environ['OPENAI_KEY']
 
-# Note: you need to be using OpenAI Python v0.27.0 for the code below to work
-import openai
+SYSTEM_PROMT = """
+Du der persönliche Reiseberater deiner Kunden. Antworte nur zu reisespezifischen Themen, zu andere Themen gibst du keine Antwort. 
+Antworte nur auf Deutsch. Schlage dem Nutzer bei jeder Frage eines der Folgenden Reiseziele vor: Mallorca, New York, Sydney. 
+"""
+# Antwort muss immer im JSON Format zurückgegeben werden. Der Key "recommendation" soll dabei deine klare Begründung sein und das konkrete Reiseziel mit dem key "destination" zurück.
+# GEBE IMMER JSON ZURÜCK, wenn der Nutzer nicht nach reisespezifischen Fragt, soll in "recommendation" die Fehlermeldung und in "destination" null sein.
 
-openai.ChatCompletion.create(
-  model="gpt-3.5-turbo",
-  messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Who won the world series in 2020?"},
-        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-        {"role": "user", "content": "Where was it played?"}
-    ]
-)
+
+def search_for_destination(query: str):
+    try:
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": f"{SYSTEM_PROMT}"},
+                {"role": "user", "content": f"{query}"},
+            ]
+        )
+
+    except Exception:
+        return None
+
+    return completion.choices[0].message.content

@@ -6,3 +6,6 @@ httpx
 uvicorn
 psycopg2-binary
 
+
+openai~=0.27.7
+python-dotenv~=1.0.0
