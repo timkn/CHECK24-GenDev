@@ -9,6 +9,7 @@ class Hotel(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     stars = Column(Integer)
+    offers = relationship("Offer", back_populates="hotel")
 
 
 class Offer(Base):
