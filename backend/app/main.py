@@ -2,7 +2,8 @@ from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from app import models, schemas, crud, controller
 from app.database import engine, SessionLocal
