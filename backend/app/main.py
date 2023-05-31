@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
+
 from app import models, schemas, crud, controller
 from app.database import engine, SessionLocal
-from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -24,7 +27,6 @@ app.add_middleware(
 )
 
 
-
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -43,9 +45,15 @@ def ai_search(query: str):
     return {"response": query}
 
 
-@app.get("/hotels/{hotel_id}", response_model=schemas.Hotel)
+@app.get("/hotels/{hotel_id}/offers", response_model=schemas.Hotel)
 def read_hotel(hotel_id: int, db: Session = Depends(get_db)):
     db_hotel = crud.get_hotel(db, hotel_id=hotel_id)
     if db_hotel is None:
         raise HTTPException(status_code=404, detail="Hotel not found")
     return db_hotel
+
+
+@app.get("/offers")
+def search_offers(airport: str, date_from: datetime, date_to: datetime, duration: int, count_adults: int,
+                  count_children: int):
+    return {"data": f"{airport}, {date_from}, {date_to}, {duration}, {count_adults}"}
