@@ -91,7 +91,7 @@
 
     let ai_response:string = ""
 
-    const URL = "http://localhost:8000/aisearch"
+    const URL = "http://144.24.175.18:8000/aisearch"
     async function ai_search(query: string) {
         const response = await fetch(`${URL}?query=${query}`);
         const json = await response.json();
@@ -158,14 +158,31 @@
     const close_all= () => items.forEach((_,i)=> items[i] = false)
     const open_all = () => items.forEach((_,i)=> items[i] = true)
 
-    function handleSubmit() {
-        close_all();
+        function handleSubmit() {
+            close_all();
+
+            let airport = "PMI";
+        let dateFrom = "2021-08-01";
+        let dateTo = "2021-08-08";
+        let duration = 7;
+        let countAdults = 2;
+        let countChildren = 1;
+        let host = "http://localhost:8000";
+
+        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error(error));
     }
 
 
 
 
     onMount(open_all);
+
+    
 
 
 
