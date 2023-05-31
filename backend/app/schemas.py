@@ -17,27 +17,26 @@ class Hotel(HotelBase):
 
 
 class OfferBase(BaseModel):
-    outbounddeparturedatetime: datetime
-    inbounddeparturedatetime: datetime
+    outbounddeparturedatetime: str
+    inbounddeparturedatetime: str
     countadults: int
     countchildren: int
-    price: float
+    price: int
     inbounddepartureairport: str
     inboundarrivalairport: str
     inboundarrivaldatetime: str
     outbounddepartureairport: str
     outboundarrivalairport: str
-    outboundarrivaldatetime: datetime
+    outboundarrivaldatetime: str
     meal_type: str
     oceanview: bool
     roomtype: str
 
 class OfferCreate(OfferBase):
-    hotel_id: int
+    hotelid: int
 
 class Offer(OfferBase):
-    id: int
-    hotel_id: int
+    hotelid: int
 
 
     class Config:
