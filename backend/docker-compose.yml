@@ -13,9 +13,6 @@ services:
     environment:
     depends_on:
       - db
-    labels: # new
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`fastapi.localhost`)"
   db:
     image: postgres:15-alpine
     restart: always
@@ -28,13 +25,5 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=gendev
-  traefik:
-    image: traefik:v2.9.6
-    ports:
-      - 8008:80
-      - 8081:8080
-    volumes:
-      - "./traefik.dev.toml:/etc/traefik/traefik.toml"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 volumes:
   postgres_data:
