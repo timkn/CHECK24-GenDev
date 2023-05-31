@@ -24,7 +24,7 @@ class OfferBase(BaseModel):
     price: float
     inbounddepartureairport: str
     inboundarrivalairport: str
-    inboundarrivaldatetime: datetime
+    inboundarrivaldatetime: str
     outbounddepartureairport: str
     outboundarrivalairport: str
     outboundarrivaldatetime: datetime

@@ -13,22 +13,21 @@ class Hotel(Base):
 
 
 class Offer(Base):
-    __tablename__ = 'offers'
-    id = Column(Integer, primary_key=True)
-    hotel_id = Column(Integer, ForeignKey('hotels.id'))
-    outbounddeparturedatetime = Column(DateTime)
-    inbounddeparturedatetime = Column(DateTime)
+    __tablename__ = 'offers_1'
+    hotelid = Column(Integer, ForeignKey('hotels.id'))
+    outbounddeparturedatetime = Column(String)
+    inbounddeparturedatetime = Column(String)
     countadults = Column(Integer)
     countchildren = Column(Integer)
-    price = Column(Float)
+    price = Column(Integer)
     inbounddepartureairport = Column(String)
     inboundarrivalairport = Column(String)
-    inboundarrivaldatetime = Column(DateTime)
+    inboundarrivaldatetime = Column(String)
     outbounddepartureairport = Column(String)
     outboundarrivalairport = Column(String)
-    outboundarrivaldatetime = Column(DateTime)
-    meal_type = Column(String)
+    outboundarrivaldatetime = Column(String)
+    mealtype = Column(String)
     oceanview = Column(Boolean)
     roomtype = Column(String)
-    hotel = relationship("Hotel", back_populates="offers")
+    hotel = relationship("Hotel", back_populates="offers_1")
 
