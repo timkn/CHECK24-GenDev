@@ -62,15 +62,29 @@ So hat im Moment die Datenbank Tabelle fast gleiche Schema, wie das csv.
 Um eine schnelle suche zu ermöglichen habe einen Indexierung verwendet.
 
 
-## Backend
+### Backend
+Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```http://localhost:xxxx/docs``` die Endpointe angeschaut werden.
+FastAPI ist realtiv einfach zu benutzen. 
 
+### Frontend
+Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite.
+
+### Funktionen
+- #### OpenAI
+    ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. 
+    Aber ich es trozdem eine gute Idee, deshalb habe ich sie drin gelassen.
+
+
+### Honweise
+- es wird nur ein Aiport pro Suche unterstützt
 
 ### aktuelle Probleme:
 - Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern querys länger.
 - Server hat kein HTTPS, deshalb kann das deployte Frontend nicht auf das Backend zugreifen.
 
-### Verbesserungen, welche getätigt werden könnten
+### Verbesserungen, welche ich mir überlegt habe
 - Datenbank Schema anpassen
+- Redis Cache bei FastAPI implementieren
 
 
 ## How to run locally
