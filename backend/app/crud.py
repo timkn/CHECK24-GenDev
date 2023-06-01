@@ -10,24 +10,18 @@ def get_hotel(db: Session, hotel_id: int):
 
 
 def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str, duration: int):
-	date_from_timestamp = date_from
-	date_to_timestamp = date_to
-
-
-	print("date_from_timestamp = ", date_from_timestamp)
-	print("date_to_timestamp = ", date_to_timestamp)
-
-
 
 	sql = f"""
-		SELECT *
+		select distinct min(price) as min, *
 		FROM offers_1, hotels
-		WHERE outbounddeparturedatetime BETWEEN '{date_from_timestamp}' AND '{date_to_timestamp}'
-		AND inboundarrivaldatetime BETWEEN '{date_from_timestamp}' AND '{date_to_timestamp}'
+		where outbounddeparturedatetime >= '{date_from}'
+		AND inboundarrivaldatetime <= '{date_to}'
 		AND countadults={count_adults} AND countchildren={count_children}
 		AND outbounddepartureairport='{airport}'
-		AND offers_1.hotelid = hotels.id
-		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval '{duration} days';
+		and hotels.id = offers_1.hotelid
+		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval '{duration} days'
+		group by hotelid, outbounddeparturedatetime, inbounddeparturedatetime, countadults, countchildren, price, inbounddepartureairport, outboundarrivalairport, inboundarrivaldatetime, outbounddepartureairport, inboundarrivalairport, outboundarrivaldatetime, mealtype, oceanview, roomtype, id, name, stars
+		order by min;
 		"""
 
 	res = db.execute(text(sql))
@@ -39,33 +33,28 @@ def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, c
 	results = []
 	for row in result_set:
 		result = {
-			'hotelid': row[0],
-			'outbounddeparturedatetime': row[1],
-			'inbounddeparturedatetime': row[2],
-			'countadults': row[3],
-			'countchildren': row[4],
-			'price': row[5],
-			'inbounddepartureairport': row[6],
-			'inboundarrivalairport': row[7],
-			'inboundarrivaldatetime': row[8],
-			'outbounddepartureairport': row[9],
-			'outboundarrivalairport': row[10],
-			'outboundarrivaldatetime': row[11],
-			'mealtype': row[12],
-			'oceanview': bool(row[13]),
-			'roomtype': row[14],
+			'min': row[0],
+			'hotelid': row[1],
+			'outbounddeparturedatetime': row[2],
+			'inbounddeparturedatetime': row[3],
+			'countadults': row[4],
+			'countchildren': row[5],
+			'price': row[6],
+			'inbounddepartureairport': row[7],
+			'inboundarrivalairport': row[8],
+			'inboundarrivaldatetime': row[9],
+			'outbounddepartureairport': row[10],
+			'outboundarrivalairport': row[11],
+			'outboundarrivaldatetime': row[12],
+			'mealtype': row[13],
+			'oceanview': bool(row[14]),
+			'roomtype': row[15],
 			'hotel': {
-				'id': row[15],
-				'name': row[16],
-				'stars': row[17]
+				'id': row[16],
+				'name': row[17],
+				'stars': row[18]
 			}
 		}
 		results.append(result)
+	print(results)
 	return results
-
-
-
-
-def get_offers_2(db: Session, date_from: str, date_to: str, count_adults: int, count_children: int, airport: str,
-				 duration: int):
-	return db.query(models.Offer).limit(10)

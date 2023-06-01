@@ -6,8 +6,10 @@ class HotelBase(BaseModel):
     name: str
     stars: int
 
+
 class HotelCreate(HotelBase):
     pass
+
 
 class Hotel(HotelBase):
     id: int
@@ -32,12 +34,14 @@ class OfferBase(BaseModel):
     oceanview: bool
     roomtype: str
 
+
 class OfferCreate(OfferBase):
     hotelid: int
 
-class Offer(OfferBase):
-    hotelid: int
 
+class Offer(OfferBase):
+    id: int
+    hotelid: int
 
     class Config:
         orm_mode = True

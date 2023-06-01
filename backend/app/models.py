@@ -14,20 +14,23 @@ class Hotel(Base):
 
 class Offer(Base):
     __tablename__ = 'offers_1'
+    id = Column(Integer, primary_key=True, autoincrement=True)
     hotelid = Column(Integer, ForeignKey('hotels.id'))
-    outbounddeparturedatetime = Column(String)
+    outbounddeparturedatetime = Column(DateTime)
     inbounddeparturedatetime = Column(String)
     countadults = Column(Integer)
     countchildren = Column(Integer)
     price = Column(Integer)
     inbounddepartureairport = Column(String)
     inboundarrivalairport = Column(String)
-    inboundarrivaldatetime = Column(String)
+    inboundarrivaldatetime = Column(DateTime)
     outbounddepartureairport = Column(String)
     outboundarrivalairport = Column(String)
     outboundarrivaldatetime = Column(String)
     mealtype = Column(String)
     oceanview = Column(Boolean)
     roomtype = Column(String)
-    hotel = relationship("Hotel", back_populates="offers_1")
+    hotel = relationship("Hotel", back_populates="offers")
+
+
 

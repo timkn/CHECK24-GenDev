@@ -1,6 +1,5 @@
 <script lang="ts">
 
-
     import {
         Accordion,
         AccordionItem,
@@ -63,8 +62,6 @@
     }
 
 
-    const airports = [`München`, `Köln`, `Berlin`, `Hamburg`]
-
     let selected = []
 
     let date_from:Date = new Date()
@@ -76,7 +73,6 @@
     let badges = [
         {name: 'Mallorca', color: 'blue', class: 'm-2'},
         {name: 'Paris', color: 'blue', class: 'm-2'},
-        {name: 'Kreta', color: 'blue', class: 'm-2'},
         {name: 'Sydney', color: 'blue', class: 'm-2'},
     ]
 
@@ -91,13 +87,131 @@
 
     let ai_response:string = ""
 
-    const URL = "http://144.24.175.18:8000/aisearch"
+    const URL = "http://localhost:8000/aisearch"
     async function ai_search(query: string) {
         const response = await fetch(`${URL}?query=${query}`);
         const json = await response.json();
         console.log(json);
         return json;
     }
+    const airportFullNames: string[] = [
+  "Amsterdam Airport Schiphol",
+  "Berlin Brandenburg Airport",
+  "Billund Airport",
+  "Bremen Airport",
+  "Bern Airport",
+  "Brussels Airport",
+  "EuroAirport Basel-Mulhouse-Freiburg",
+  "Cologne Bonn Airport",
+  "Brussels South Charleroi Airport",
+  "Copenhagen Airport",
+  "Dresden Airport",
+  "Dortmund Airport",
+  "Düsseldorf Airport",
+  "Eindhoven Airport",
+  "Erfurt-Weimar Airport",
+  "Friedrichshafen Airport",
+  "Karlsruhe/Baden-Baden Airport",
+  "Memmingen Airport",
+  "Münster Osnabrück International Airport",
+  "Frankfurt Airport",
+  "Graz Airport",
+  "Geneva Airport",
+  "Westerland Sylt Airport",
+  "Hanover Airport",
+  "Hamburg Airport",
+  "Frankfurt-Hahn Airport",
+  "Innsbruck Airport",
+  "Klagenfurt Airport",
+  "John Paul II International Airport Kraków-Balice",
+  "Kassel Airport",
+  "Lübeck Airport",
+  "Leipzig/Halle Airport",
+  "Linz Airport",
+  "Luxembourg Airport",
+  "Munich Airport",
+  "Weeze Airport",
+  "Nuremberg Airport",
+  "Paderborn Lippstadt Airport",
+  "Václav Havel Airport Prague",
+  "Rostock-Laage Airport",
+  "Rotterdam The Hague Airport",
+  "Saarbrücken Airport",
+  "Stuttgart Airport",
+  "Strasbourg Airport",
+  "Salzburg Airport",
+  "Vienna International Airport",
+  "Warsaw Chopin Airport",
+  "Zurich Airport",
+];
+
+function mapAirportNameToCode(name: string): string | undefined {
+  const airportMap: { [key: string]: string } = {
+    "Amsterdam Airport Schiphol": "AMS",
+    "Berlin Brandenburg Airport": "BER",
+    "Billund Airport": "BLL",
+    "Bremen Airport": "BRE",
+    "Bern Airport": "BRN",
+    "Brussels Airport": "BRU",
+    "EuroAirport Basel-Mulhouse-Freiburg": "BSL",
+    "Cologne Bonn Airport": "CGN",
+    "Brussels South Charleroi Airport": "CRL",
+    "Copenhagen Airport": "CSO",
+    "Dresden Airport": "DRS",
+    "Dortmund Airport": "DTM",
+    "Düsseldorf Airport": "DUS",
+    "Eindhoven Airport": "EIN",
+    "Erfurt-Weimar Airport": "ERF",
+    "Friedrichshafen Airport": "FDH",
+    "Karlsruhe/Baden-Baden Airport": "FKB",
+    "Memmingen Airport": "FMM",
+    "Münster Osnabrück International Airport": "FMO",
+    "Frankfurt Airport": "FRA",
+    "Graz Airport": "GRZ",
+    "Geneva Airport": "GVA",
+    "Westerland Sylt Airport": "GWT",
+    "Hannover Airport": "HAJ",
+    "Hamburg Airport": "HAM",
+    "Frankfurt-Hahn Airport": "HHN",
+    "Innsbruck Airport": "INN",
+    "Klagenfurt Airport": "KLU",
+    "John Paul II International Airport Kraków-Balice": "KRK",
+    "Kassel Airport": "KSF",
+    "Lübeck Airport": "LBC",
+    "Leipzig/Halle Airport": "LEJ",
+    "Linz Airport": "LNZ",
+    "Luxembourg Airport": "LUX",
+    "Munich Airport": "MUC",
+    "Weeze Airport": "NRN",
+    "Nuremberg Airport": "NUE",
+    "Paderborn Lippstadt Airport": "PAD",
+    "Václav Havel Airport Prague": "PRG",
+    "Rostock-Laage Airport": "RLG",
+    "Rotterdam The Hague Airport": "RTM",
+    "Saarbrücken Airport": "SCN",
+    "Stuttgart Airport": "STR",
+    "Strasbourg Airport": "SXB",
+    "Salzburg Airport": "SZG",
+    "Vienna International Airport": "VIE",
+    "Warsaw Chopin Airport": "WAW",
+    "Zurich Airport": "ZRH",
+  };
+
+  // Convert the name to lowercase and remove leading/trailing whitespace
+  const lowercaseName = name.toLowerCase().trim();
+
+  // Iterate over the airport map entries and find the matching code
+  for (const [airportName, airportCode] of Object.entries(airportMap)) {
+    if (lowercaseName === airportName.toLowerCase()) {
+      return airportCode;
+    }
+  }
+
+  return undefined; // If no match found, return undefined
+}
+
+
+
 
     function getAiData() {
         ai_search(search_text).then((data) => {
@@ -115,9 +229,6 @@
 
         badges = []
     
-        if ("kreta".indexOf(text) !== -1    || text.indexOf("kreta") !== -1) {
-            badges.push({name: 'Kreta', color: 'blue', class: 'm-2'});
-        }
         if ("sydney".indexOf(text) !== -1 || text.indexOf("sydney") !== -1) {
             badges.push({name: 'Sydney', color: 'blue', class: 'm-2'});
         }
@@ -150,7 +261,12 @@
 
 
 
-    let duration = 0;
+    let duration = 7;
+
+
+    let offers = []
+
+    let msg = ""
 
 
 
@@ -159,22 +275,34 @@
     const open_all = () => items.forEach((_,i)=> items[i] = true)
 
         function handleSubmit() {
+            offers = []
             close_all();
 
-            let airport = "PMI";
-        let dateFrom = "2021-08-01";
-        let dateTo = "2021-08-08";
-        let duration = 7;
-        let countAdults = 2;
-        let countChildren = 1;
+        let airport = mapAirportNameToCode(selected[0]);
+        let dateFrom = date_from.toISOString().substring(0, 10);
+        let dateTo = date_to.toISOString().substring(0, 10);
+        let durationP = duration 
+        let countAdults = counter_adults;
+        let countChildren = counter_children;
         let host = "http://localhost:8000";
 
-        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+    
+        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${durationP}&count_adults=${countAdults}&count_children=${countChildren}`;
 
         fetch(url)
         .then(response => response.json())
-        .then(data => console.log(data))
+        .then(data => {
+            offers = data
+            if (offers.length == 0) {
+                msg = "Keine Angebote gefunden"
+            } else {
+                msg = ""
+            }
+        }
+        )
         .catch(error => console.error(error));
+        
     }
 
 
@@ -182,6 +310,8 @@
 
     onMount(open_all);
 
+
+    let limit = 30;
     
 
 
@@ -262,19 +392,19 @@
             <Badge large>{airport}</Badge>
             {/each}
         </span>    
-        <MultiSelect bind:selected options={airports}/>
+        <MultiSelect bind:selected options={airportFullNames}/>
     </AccordionItem>
     <AccordionItem bind:open={items[2]}>
         <span slot="header" class="flex flex-row gap-4">
             <p>3. Zeitraum wählen</p>
-            <Badge large><p>{date_from.getDay()}.{date_from.getMonth()}.{date_from.getFullYear()} - {date_to.getDay()}.{date_to.getMonth()}.{date_to.getFullYear()}</p></Badge>
+            <Badge large><p>{date_from.toISOString().substring(0, 10)} - {date_to.toISOString().substring(0, 10)}</p></Badge>
         </span>
         <div class="flex flex-row justify-around">
             <div class="flex flex-row justify-center items-baseline gap-4">
                 <p>vom</p>
-                <DateInput bind:value={date_from} placeholder="Select a date"/>
+                <DateInput bind:value={date_from} format="yyyy-MM-dd" placeholder="Select a date"/>
                 <p>bis</p>
-                <DateInput bind:value={date_to} placeholder="Select a date"/>
+                <DateInput bind:value={date_to} format="yyyy-MM-dd" placeholder="Select a date"/>
                 <p>Dauer:</p>
                 <Input type="text"  bind:value={duration} required/>
             </div>
@@ -316,9 +446,22 @@
     </svg>
 </button>
 
+<ul class="flex flex-row flex-wrap gap-4 justify-center m-4">
+    {#each offers.slice(0, limit) as offer}
+        <OfferCard data={offer}  />
+    {/each}
+</ul>
 
-<code>selected = {JSON.stringify(selected)}</code>
+{#if offers.length != 0}
+    <Button on:click={() => limit+=30}>
+        mehr laden<svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+    </Button>
+{/if}
+
+
+<p>{msg}</p>
 
 
 
-<OfferCard></OfferCard>
+
+
