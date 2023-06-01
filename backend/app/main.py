@@ -63,3 +63,14 @@ def search_offers(airport: str, date_from: date, date_to: date, duration: int, c
 		raise HTTPException(status_code=404, detail="Offers not found")
 
 	return offers
+
+
+@app.get("/hotel/{hotel_id}/offers")
+def search_offers(hotel_id: int, airport: str, date_from: date, date_to: date, duration: int, count_adults: int, count_children: int,
+				  db: Session = Depends(get_db)):
+	offers = crud.get_offers_from_hotel(db, date_from, date_to, count_adults, count_children, airport, duration, hotel_id)
+
+	if offers is None:
+		raise HTTPException(status_code=404, detail="Offers not found")
+
+	return offers

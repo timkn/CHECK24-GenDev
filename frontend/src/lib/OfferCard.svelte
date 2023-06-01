@@ -1,6 +1,7 @@
 <script>
     import { Card, Rating, Button, Modal } from "flowbite-svelte";
     import OfferSmall from "./OfferSmall.svelte";
+    import { onMount } from 'svelte';
     let offer = {
         "outbounddeparturedatetime" : "2021-08-01T06:00:00",
         "inbounddeparturedatetime" : "2021-08-01T06:00:00",
@@ -23,12 +24,38 @@
         "hotelstars" : 4,
     }
 
+    export let userData;
     export let data;
 
     console.log(data);
 
     let clickOutsideModal = false;
 
+    let offers = [];
+    let loading_results = false;
+    let results_here = false;
+    let host = "http://localhost:8000";
+
+    function get_offers() {
+      loading_results = true;
+      results_here = false;
+    
+
+      let url = `${host}/hotel/${data.hotelid}/offers?airport=${userData.airport}&date_from=${userData.dateFrom}&date_to=${userData.dateTo}&duration=${userData.duration}&count_adults=${userData.countAdults}&count_children=${userData.countChildren}`;
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            offers = data;
+            loading_results = false;
+            results_here = true;
+        }
+        )
+        .catch(error => console.error(error));
+
+        }
+      
+    
 
 </script>
 <Card on:click={() => clickOutsideModal = true}>
@@ -54,14 +81,22 @@
         <span class="text-1xl font-semibold">€</span>
     </div>
     </div>
-    <Button on:click={() => clickOutsideModal = true}>more</Button>
+    <Button on:click={() => {
+      clickOutsideModal = true
+      get_offers()
+      }}>more</Button>
 
     
 </Card>
 
-<Modal title="{offer.hotelname}" bind:open={clickOutsideModal} size="xl" autoclose outsideclose>
+<Modal title="{data.hotel.name}" bind:open={clickOutsideModal} size="xl" autoclose outsideclose>
   <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
     Alle Angebote von dem Hotel:
-  <OfferSmall></OfferSmall>
+<div class="flex flex-row flex-wrap gap-4">
+  {#each offers as offer}
+  <OfferSmall data={offer}></OfferSmall>
+{/each}
+</div>
+   
 
 </Modal>

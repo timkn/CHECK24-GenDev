@@ -270,11 +270,11 @@ function mapAirportNameToCode(name: string): string | undefined {
 
 
     let offers = []
+
+    let userData = {};
     
 
     
-
-
 
 
     const items = Array(4);
@@ -301,14 +301,22 @@ function mapAirportNameToCode(name: string): string | undefined {
     let airport = mapAirportNameToCode(selected[0]);
     let dateFrom = date_from.toISOString().substring(0, 10);
     let dateTo = date_to.toISOString().substring(0, 10);
-    let durationP = duration 
     let countAdults = counter_adults;
     let countChildren = counter_children;
     let host = "http://localhost:8000";
 
+    userData = {
+        airport: airport,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+        duration: duration,
+        countAdults: countAdults,
+        countChildren: countChildren,
+    }
 
 
-    let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${durationP}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+    let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
 
     fetch(url)
     .then(response => response.json())
@@ -464,14 +472,16 @@ function mapAirportNameToCode(name: string): string | undefined {
 
 <ul class="flex flex-row flex-wrap gap-4 justify-center m-4">
     {#each offers.slice(0, limit) as offer}
-        <OfferCard data={offer}  />
+        <OfferCard userData={userData} data={offer}  />
     {/each}
 </ul>
 
 {#if offers.length != 0}
+<div class="flex justify-center">
     <Button on:click={() => limit+=30}>
         mehr laden<svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
     </Button>
+</div>
 {/if}
 
 {#if offers.length == 0 && results_here}
