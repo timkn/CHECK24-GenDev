@@ -1,18 +1,18 @@
 <script>
-  import "../app.postcss";
-  import Nav from "$lib/Nav.svelte";
-  import Footer from "$lib/Footer.svelte";
-  import "@fontsource/poppins";
+    import "../app.postcss";
+    import Nav from "$lib/Nav.svelte";
+    import Footer from "$lib/Footer.svelte";
+    import "@fontsource/poppins";
 </script>
 
-<Nav />
+<Nav/>
 
-<slot />
+<slot/>
 
-<Footer />
+<Footer/>
 
 <style l>
-  * {
-    font-family: Poppins, sans-serif;
-  }
+    * {
+        font-family: Poppins, sans-serif;
+    }
 </style>

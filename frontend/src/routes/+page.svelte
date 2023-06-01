@@ -15,12 +15,12 @@
         Toast,
     } from 'flowbite-svelte';
     import MultiSelect from 'svelte-multiselect';
-    import { DateInput } from 'date-picker-svelte';
+    import {DateInput} from 'date-picker-svelte';
     import OfferCard from '$lib/OfferCard.svelte';
-    import { offset } from '@popperjs/core';
-    import { onMount } from 'svelte';
+    import {offset} from '@popperjs/core';
+    import {onMount} from 'svelte';
 
-    function calculateDaysBetweenDates(date1:Date, date2:Date) {
+    function calculateDaysBetweenDates(date1: Date, date2: Date) {
         const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
         const diffInMs = Math.abs(date2.getTime() - date1.getTime());
         const diffInDays = Math.round(diffInMs / oneDay);
@@ -68,8 +68,8 @@
 
     let selected = []
 
-    let date_from:Date = new Date()
-    let date_to:Date = new Date()
+    let date_from: Date = new Date()
+    let date_to: Date = new Date()
 
 
     let defaultModal = false;
@@ -90,132 +90,132 @@
     let noariport = false
 
 
-    let ai_response:string = ""
+    let ai_response: string = ""
 
     const URL = "http://localhost:8000/aisearch"
+
     async function ai_search(query: string) {
         const response = await fetch(`${URL}?query=${query}`);
         const json = await response.json();
         console.log(json);
         return json;
     }
+
     const airportFullNames: string[] = [
-  "Amsterdam Airport Schiphol",
-  "Berlin Brandenburg Airport",
-  "Billund Airport",
-  "Bremen Airport",
-  "Bern Airport",
-  "Brussels Airport",
-  "EuroAirport Basel-Mulhouse-Freiburg",
-  "Cologne Bonn Airport",
-  "Brussels South Charleroi Airport",
-  "Copenhagen Airport",
-  "Dresden Airport",
-  "Dortmund Airport",
-  "Düsseldorf Airport",
-  "Eindhoven Airport",
-  "Erfurt-Weimar Airport",
-  "Friedrichshafen Airport",
-  "Karlsruhe/Baden-Baden Airport",
-  "Memmingen Airport",
-  "Münster Osnabrück International Airport",
-  "Frankfurt Airport",
-  "Graz Airport",
-  "Geneva Airport",
-  "Westerland Sylt Airport",
-  "Hanover Airport",
-  "Hamburg Airport",
-  "Frankfurt-Hahn Airport",
-  "Innsbruck Airport",
-  "Klagenfurt Airport",
-  "John Paul II International Airport Kraków-Balice",
-  "Kassel Airport",
-  "Lübeck Airport",
-  "Leipzig/Halle Airport",
-  "Linz Airport",
-  "Luxembourg Airport",
-  "Munich Airport",
-  "Weeze Airport",
-  "Nuremberg Airport",
-  "Paderborn Lippstadt Airport",
-  "Václav Havel Airport Prague",
-  "Rostock-Laage Airport",
-  "Rotterdam The Hague Airport",
-  "Saarbrücken Airport",
-  "Stuttgart Airport",
-  "Strasbourg Airport",
-  "Salzburg Airport",
-  "Vienna International Airport",
-  "Warsaw Chopin Airport",
-  "Zurich Airport",
-];
+        "Amsterdam Airport Schiphol",
+        "Berlin Brandenburg Airport",
+        "Billund Airport",
+        "Bremen Airport",
+        "Bern Airport",
+        "Brussels Airport",
+        "EuroAirport Basel-Mulhouse-Freiburg",
+        "Cologne Bonn Airport",
+        "Brussels South Charleroi Airport",
+        "Copenhagen Airport",
+        "Dresden Airport",
+        "Dortmund Airport",
+        "Düsseldorf Airport",
+        "Eindhoven Airport",
+        "Erfurt-Weimar Airport",
+        "Friedrichshafen Airport",
+        "Karlsruhe/Baden-Baden Airport",
+        "Memmingen Airport",
+        "Münster Osnabrück International Airport",
+        "Frankfurt Airport",
+        "Graz Airport",
+        "Geneva Airport",
+        "Westerland Sylt Airport",
+        "Hanover Airport",
+        "Hamburg Airport",
+        "Frankfurt-Hahn Airport",
+        "Innsbruck Airport",
+        "Klagenfurt Airport",
+        "John Paul II International Airport Kraków-Balice",
+        "Kassel Airport",
+        "Lübeck Airport",
+        "Leipzig/Halle Airport",
+        "Linz Airport",
+        "Luxembourg Airport",
+        "Munich Airport",
+        "Weeze Airport",
+        "Nuremberg Airport",
+        "Paderborn Lippstadt Airport",
+        "Václav Havel Airport Prague",
+        "Rostock-Laage Airport",
+        "Rotterdam The Hague Airport",
+        "Saarbrücken Airport",
+        "Stuttgart Airport",
+        "Strasbourg Airport",
+        "Salzburg Airport",
+        "Vienna International Airport",
+        "Warsaw Chopin Airport",
+        "Zurich Airport",
+    ];
 
-function mapAirportNameToCode(name: string): string | undefined {
-  const airportMap: { [key: string]: string } = {
-    "Amsterdam Airport Schiphol": "AMS",
-    "Berlin Brandenburg Airport": "BER",
-    "Billund Airport": "BLL",
-    "Bremen Airport": "BRE",
-    "Bern Airport": "BRN",
-    "Brussels Airport": "BRU",
-    "EuroAirport Basel-Mulhouse-Freiburg": "BSL",
-    "Cologne Bonn Airport": "CGN",
-    "Brussels South Charleroi Airport": "CRL",
-    "Copenhagen Airport": "CSO",
-    "Dresden Airport": "DRS",
-    "Dortmund Airport": "DTM",
-    "Düsseldorf Airport": "DUS",
-    "Eindhoven Airport": "EIN",
-    "Erfurt-Weimar Airport": "ERF",
-    "Friedrichshafen Airport": "FDH",
-    "Karlsruhe/Baden-Baden Airport": "FKB",
-    "Memmingen Airport": "FMM",
-    "Münster Osnabrück International Airport": "FMO",
-    "Frankfurt Airport": "FRA",
-    "Graz Airport": "GRZ",
-    "Geneva Airport": "GVA",
-    "Westerland Sylt Airport": "GWT",
-    "Hannover Airport": "HAJ",
-    "Hamburg Airport": "HAM",
-    "Frankfurt-Hahn Airport": "HHN",
-    "Innsbruck Airport": "INN",
-    "Klagenfurt Airport": "KLU",
-    "John Paul II International Airport Kraków-Balice": "KRK",
-    "Kassel Airport": "KSF",
-    "Lübeck Airport": "LBC",
-    "Leipzig/Halle Airport": "LEJ",
-    "Linz Airport": "LNZ",
-    "Luxembourg Airport": "LUX",
-    "Munich Airport": "MUC",
-    "Weeze Airport": "NRN",
-    "Nuremberg Airport": "NUE",
-    "Paderborn Lippstadt Airport": "PAD",
-    "Václav Havel Airport Prague": "PRG",
-    "Rostock-Laage Airport": "RLG",
-    "Rotterdam The Hague Airport": "RTM",
-    "Saarbrücken Airport": "SCN",
-    "Stuttgart Airport": "STR",
-    "Strasbourg Airport": "SXB",
-    "Salzburg Airport": "SZG",
-    "Vienna International Airport": "VIE",
-    "Warsaw Chopin Airport": "WAW",
-    "Zurich Airport": "ZRH",
-  };
+    function mapAirportNameToCode(name: string): string | undefined {
+        const airportMap: { [key: string]: string } = {
+            "Amsterdam Airport Schiphol": "AMS",
+            "Berlin Brandenburg Airport": "BER",
+            "Billund Airport": "BLL",
+            "Bremen Airport": "BRE",
+            "Bern Airport": "BRN",
+            "Brussels Airport": "BRU",
+            "EuroAirport Basel-Mulhouse-Freiburg": "BSL",
+            "Cologne Bonn Airport": "CGN",
+            "Brussels South Charleroi Airport": "CRL",
+            "Copenhagen Airport": "CSO",
+            "Dresden Airport": "DRS",
+            "Dortmund Airport": "DTM",
+            "Düsseldorf Airport": "DUS",
+            "Eindhoven Airport": "EIN",
+            "Erfurt-Weimar Airport": "ERF",
+            "Friedrichshafen Airport": "FDH",
+            "Karlsruhe/Baden-Baden Airport": "FKB",
+            "Memmingen Airport": "FMM",
+            "Münster Osnabrück International Airport": "FMO",
+            "Frankfurt Airport": "FRA",
+            "Graz Airport": "GRZ",
+            "Geneva Airport": "GVA",
+            "Westerland Sylt Airport": "GWT",
+            "Hannover Airport": "HAJ",
+            "Hamburg Airport": "HAM",
+            "Frankfurt-Hahn Airport": "HHN",
+            "Innsbruck Airport": "INN",
+            "Klagenfurt Airport": "KLU",
+            "John Paul II International Airport Kraków-Balice": "KRK",
+            "Kassel Airport": "KSF",
+            "Lübeck Airport": "LBC",
+            "Leipzig/Halle Airport": "LEJ",
+            "Linz Airport": "LNZ",
+            "Luxembourg Airport": "LUX",
+            "Munich Airport": "MUC",
+            "Weeze Airport": "NRN",
+            "Nuremberg Airport": "NUE",
+            "Paderborn Lippstadt Airport": "PAD",
+            "Václav Havel Airport Prague": "PRG",
+            "Rostock-Laage Airport": "RLG",
+            "Rotterdam The Hague Airport": "RTM",
+            "Saarbrücken Airport": "SCN",
+            "Stuttgart Airport": "STR",
+            "Strasbourg Airport": "SXB",
+            "Salzburg Airport": "SZG",
+            "Vienna International Airport": "VIE",
+            "Warsaw Chopin Airport": "WAW",
+            "Zurich Airport": "ZRH",
+        };
 
-  // Convert the name to lowercase and remove leading/trailing whitespace
-  const lowercaseName = name.toLowerCase().trim();
+        // Convert the name to lowercase and remove leading/trailing whitespace
+        const lowercaseName = name.toLowerCase().trim();
 
-  // Iterate over the airport map entries and find the matching code
-  for (const [airportName, airportCode] of Object.entries(airportMap)) {
-    if (lowercaseName === airportName.toLowerCase()) {
-      return airportCode;
+        // Iterate over the airport map entries and find the matching code
+        for (const [airportName, airportCode] of Object.entries(airportMap)) {
+            if (lowercaseName === airportName.toLowerCase()) {
+                return airportCode;
+            }
+        }
+
+        return undefined; // If no match found, return undefined
     }
-  }
-
-  return undefined; // If no match found, return undefined
-}
-
-
 
 
     function getAiData() {
@@ -233,7 +233,7 @@ function mapAirportNameToCode(name: string): string | undefined {
         text = text.toLowerCase()
 
         badges = []
-    
+
         if ("sydney".indexOf(text) !== -1 || text.indexOf("sydney") !== -1) {
             badges.push({name: 'Sydney', color: 'blue', class: 'm-2'});
         }
@@ -256,7 +256,7 @@ function mapAirportNameToCode(name: string): string | undefined {
         console.log(badges)
     }
 
-    function handleDestination(value:string) {
+    function handleDestination(value: string) {
         console.log(value)
         destination = value
         badges = []
@@ -265,21 +265,17 @@ function mapAirportNameToCode(name: string): string | undefined {
     }
 
 
-
     let duration = 7;
 
 
     let offers = []
 
     let userData = {};
-    
-
-    
 
 
     const items = Array(4);
-    const close_all= () => items.forEach((_,i)=> items[i] = false)
-    const open_all = () => items.forEach((_,i)=> items[i] = true)
+    const close_all = () => items.forEach((_, i) => items[i] = false)
+    const open_all = () => items.forEach((_, i) => items[i] = true)
 
     function handleSubmit() {
         close_all();
@@ -288,60 +284,51 @@ function mapAirportNameToCode(name: string): string | undefined {
 
 
         if (selected.length == 0) {
-        noariport = true;
-        return
-            }
+            noariport = true;
+            return
+        }
 
 
         loading_results = true;
         results_here = false;
-        
 
 
-    let airport = mapAirportNameToCode(selected[0]);
-    let dateFrom = date_from.toISOString().substring(0, 10);
-    let dateTo = date_to.toISOString().substring(0, 10);
-    let countAdults = counter_adults;
-    let countChildren = counter_children;
-    let host = "http://localhost:8000";
+        let airport = mapAirportNameToCode(selected[0]);
+        let dateFrom = date_from.toISOString().substring(0, 10);
+        let dateTo = date_to.toISOString().substring(0, 10);
+        let countAdults = counter_adults;
+        let countChildren = counter_children;
+        let host = "http://localhost:8000";
 
-    userData = {
-        airport: airport,
-        dateFrom: dateFrom,
-        dateTo: dateTo,
-        duration: duration,
-        countAdults: countAdults,
-        countChildren: countChildren,
+        userData = {
+            airport: airport,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            duration: duration,
+            countAdults: countAdults,
+            countChildren: countChildren,
+        }
+
+
+        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+        fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                            offers = data;
+                            loading_results = false;
+                            results_here = true;
+                        }
+                )
+                .catch(error => console.error(error));
+
     }
-
-
-
-    let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
-
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        offers = data;
-        loading_results = false;
-        results_here = true;
-    }
-    )
-    .catch(error => console.error(error));
-    
-    }
-
-
 
 
     onMount(open_all);
 
 
     let limit = 30;
-    
-
-
-
-
 
 
 </script>
@@ -362,7 +349,7 @@ function mapAirportNameToCode(name: string): string | undefined {
             {#if (destination !== "") }
                 <Badge large>{destination}</Badge>
             {/if}
-        </span>     
+        </span>
         <form>
             <label for="chat" class="sr-only">Your message</label>
             <Alert color="dark" class="px-3 py-2">
@@ -379,8 +366,10 @@ function mapAirportNameToCode(name: string): string | undefined {
                             <Button on:click={() => console.log('Handle "success"')}>Okay</Button>
                         </svelte:fragment>
                     </Modal>
-                    <Textarea bind:value={search_text} on:input={searchInSearchText} id="chat" class="mx-4" rows="1" placeholder="Suche nach einem Reiseziel oder Frage die AI..."/>
-                    <ToolbarButton on:click={getAiData} type="submit" color="blue" class="rounded-full text-blue-600 dark:text-blue-500">
+                    <Textarea bind:value={search_text} on:input={searchInSearchText} id="chat" class="mx-4" rows="1"
+                              placeholder="Suche nach einem Reiseziel oder Frage die AI..."/>
+                    <ToolbarButton on:click={getAiData} type="submit" color="blue"
+                                   class="rounded-full text-blue-600 dark:text-blue-500">
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -401,14 +390,20 @@ function mapAirportNameToCode(name: string): string | undefined {
             <p on:change={searchInAiResponse} class="m-4">{ai_response}</p>
         </form>
         <div class="flex flex-row justify-center gap-4">
-        {#each badges as badge}
-            <Button outline on:click={() => handleDestination(badge.name)}>
-                {badge.name} <svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-              </Button>
-        {:else}
-            <p>keine Reiseziele gefunden.</p>
-        {/each}
-    </div>
+            {#each badges as badge}
+                <Button outline on:click={() => handleDestination(badge.name)}>
+                    {badge.name}
+                    <svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                </Button>
+            {:else}
+                <p>keine Reiseziele gefunden.</p>
+            {/each}
+        </div>
     </AccordionItem>
     <AccordionItem bind:open={items[1]}>
         <span slot="header" class="flex flex-row gap-4">
@@ -416,13 +411,14 @@ function mapAirportNameToCode(name: string): string | undefined {
             {#each selected as airport}
             <Badge large>{airport}</Badge>
             {/each}
-        </span>    
+        </span>
         <MultiSelect bind:selected options={airportFullNames}/>
     </AccordionItem>
     <AccordionItem bind:open={items[2]}>
         <span slot="header" class="flex flex-row gap-4">
             <p>3. Zeitraum wählen</p>
-            <Badge large><p>{date_from.toISOString().substring(0, 10)} - {date_to.toISOString().substring(0, 10)}</p></Badge>
+            <Badge large><p>{date_from.toISOString().substring(0, 10)}
+                - {date_to.toISOString().substring(0, 10)}</p></Badge>
         </span>
         <div class="flex flex-row justify-around">
             <div class="flex flex-row justify-center items-baseline gap-4">
@@ -431,28 +427,34 @@ function mapAirportNameToCode(name: string): string | undefined {
                 <p>bis</p>
                 <DateInput bind:value={date_to} format="yyyy-MM-dd" placeholder="Select a date"/>
                 <p>Dauer:</p>
-                <Input type="text"  bind:value={duration} required/>
+                <Input type="text" bind:value={duration} required/>
             </div>
-        
+
         </div>
     </AccordionItem>
     <AccordionItem bind:open={items[3]}>
         <span slot="header" class="flex flex-row gap-4">
             <p>4. weitere Informationen</p>
             <Badge large>Erwachsene: {counter_adults}</Badge> <Badge large> Kinder: {counter_children}</Badge>
-        </span>       
-         <div class="flex flex-row justify-center items-baseline gap-4">
+        </span>
+        <div class="flex flex-row justify-center items-baseline gap-4">
             <p>Erwachsene</p>
             <ButtonGroup>
-                <Button outline color="red" on:click={() => counter_adults > 0 ? counter_adults-- : counter_adults}>-</Button>
+                <Button outline color="red" on:click={() => counter_adults > 0 ? counter_adults-- : counter_adults}>-
+                </Button>
                 <Input type="text" id="first_name" bind:value={counter_adults} required/>
-                <Button outline color="green" on:click={() => counter_adults < 20? counter_adults++: counter_adults}>+</Button>
+                <Button outline color="green" on:click={() => counter_adults < 20? counter_adults++: counter_adults}>+
+                </Button>
             </ButtonGroup>
             <p>Kinder</p>
             <ButtonGroup>
-                <Button outline color="red" on:click={() => counter_children > 0 ? counter_children-- : counter_children}>-</Button>
+                <Button outline color="red"
+                        on:click={() => counter_children > 0 ? counter_children-- : counter_children}>-
+                </Button>
                 <Input type="text" id="first_name" bind:value={counter_children} required/>
-                <Button outline color="green" on:click={() => counter_children < 20 ? counter_children++: counter_children}>+</Button>
+                <Button outline color="green"
+                        on:click={() => counter_children < 20 ? counter_children++: counter_children}>+
+                </Button>
             </ButtonGroup>
         </div>
     </AccordionItem>
@@ -463,25 +465,32 @@ function mapAirportNameToCode(name: string): string | undefined {
 
     <Button on:click={handleSubmit}>
         {#if loading_results}
-            <Spinner class="mr-3" size="4" color="white" />Loading ...
+            <Spinner class="mr-3" size="4" color="white"/>
+            Loading ...
         {:else}
             Los geht's
         {/if}
-    </Button> 
+    </Button>
 </div>
 
 <ul class="flex flex-row flex-wrap gap-4 justify-center m-4">
     {#each offers.slice(0, limit) as offer}
-        <OfferCard userData={userData} data={offer}  />
+        <OfferCard userData={userData} data={offer}/>
     {/each}
 </ul>
 
 {#if offers.length != 0}
-<div class="flex justify-center">
-    <Button on:click={() => limit+=30}>
-        mehr laden<svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-    </Button>
-</div>
+    <div class="flex justify-center">
+        <Button on:click={() => limit+=30}>
+            mehr laden
+            <svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clip-rule="evenodd"></path>
+            </svg>
+        </Button>
+    </div>
 {/if}
 
 {#if offers.length == 0 && results_here}
@@ -489,7 +498,6 @@ function mapAirportNameToCode(name: string): string | undefined {
         <span class="font-medium">Keine Angebote gefunden.</span> Bitte wähle andere Reisedaten.
     </Alert>
 {/if}
-
 
 
 {#if noariport}
