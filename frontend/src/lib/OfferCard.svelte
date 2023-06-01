@@ -2,29 +2,6 @@
     import {Card, Rating, Button, Modal} from "flowbite-svelte";
     import OfferSmall from "./OfferSmall.svelte";
     import {onMount} from 'svelte';
-
-    let offer = {
-        "outbounddeparturedatetime": "2021-08-01T06:00:00",
-        "inbounddeparturedatetime": "2021-08-01T06:00:00",
-        "inboundarrivaldatetime": "2021-08-01T08:00:00",
-        "outboundarrivaldatetime": "2021-08-01T08:00:00",
-
-        "inbounddepartureairport": "PMI",
-        "outbounddepartureairport": "FRA",
-        "inboundarrivalairport": "FRA",
-        "outboundarrivalairport": "PMI",
-
-        "countadults": 2,
-        "countchildren": 1,
-        "price": 100,
-        "mealtype": "allinclusive",
-        "oceanview": true,
-        "roomtype": "double",
-
-        "hotelname": "Hyatt",
-        "hotelstars": 4,
-    }
-
     export let userData;
     export let data;
 

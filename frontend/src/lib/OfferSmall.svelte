@@ -1,32 +1,6 @@
 <script>
-    import {Card} from "flowbite-svelte";
-
-    let offer = {
-        "outbounddeparturedatetime": "2021-08-01T06:00:00",
-        "inbounddeparturedatetime": "2021-08-01T06:00:00",
-        "inboundarrivaldatetime": "2021-08-01T08:00:00",
-        "outboundarrivaldatetime": "2021-08-01T08:00:00",
-
-        "inbounddepartureairport": "PMI",
-        "outbounddepartureairport": "FRA",
-        "inboundarrivalairport": "FRA",
-        "outboundarrivalairport": "PMI",
-
-        "countadults": 2,
-        "countchildren": 1,
-        "price": 100,
-        "mealtype": "allinclusive",
-        "oceanview": true,
-        "roomtype": "double",
-
-        "hotelname": "Hyatt",
-        "hotelstars": 4,
-    }
-
-
+    import {Card, Timeline, TimelineItem} from "flowbite-svelte";
     export let data;
-
-
 </script>
 <Card>
     <p>{data.outbounddepartureairport} -  {data.outboundarrivalairport}, {data.inbounddepartureairport}
@@ -48,4 +22,27 @@
             <span class="text-1xl font-semibold">€</span>
         </div>
     </div>
+
+    <script>
+        import { Timeline, TimelineItem, Button } from 'flowbite-svelte';
+    </script>
+
+    <Timeline>
+        <TimelineItem title="{data.outbounddepartureairport}" date="{data.outbounddeparturedatetime}">
+
+        </TimelineItem>
+        <TimelineItem title="{data.outboundarrivalairport}" date="{data.outboundarrivaldatetime}">
+      
+        </TimelineItem>
+    </Timeline>
+    <Timeline>
+        <TimelineItem title="{data.inbounddepartureairport}" date="{data.inbounddeparturedatetime}">
+
+        </TimelineItem>
+        <TimelineItem title="{data.inboundarrivalairport}" date="{data.inboundarrivaldatetime}">
+
+        </TimelineItem>
+    </Timeline>
+
+
 </Card>

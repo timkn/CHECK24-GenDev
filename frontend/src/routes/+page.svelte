@@ -44,19 +44,14 @@
 
         // Compare the current hour to determine the phase of the day
         if (currentHour >= morningThreshold && currentHour < noonThreshold) {
-            console.log('Guten Morgen!');
             return 'Guten Morgen!';
         } else if (currentHour >= noonThreshold && currentHour < afternoonThreshold) {
-            console.log('Guten Mittag!');
             return 'Guten Mittag!';
         } else if (currentHour >= afternoonThreshold && currentHour < eveningThreshold) {
-            console.log('Good Tag!');
             return 'Guten Tag!';
         } else if (currentHour >= eveningThreshold && currentHour < nightThreshold) {
-            console.log('Good Abend!');
             return 'Guten Abend!';
         } else {
-            console.log('Good Tag!');
             return 'Guten Tag!';
         }
 
