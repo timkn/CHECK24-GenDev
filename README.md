@@ -1,14 +1,96 @@
 # CHECK24-GenDev
 
-Die App besteht aus einem SvelteKit Frontend, einem FastAPI Backend mit einer PostgreSQL Datanbank.
+Dieses Projekt ist Teil der CHECK24 GenDev Holiday Challenge.
+Die App besteht aus einem SvelteKit Frontend, einem FastAPI Backend mit einer PostgreSQL Datenbank.
 
-## Frontend
+## About
+
+
+### Datenbank
+Die Daten wurden mit dem gleichen Schema, wie des der CSV Datei in die Datenanbank geladen.
+Ursprünglich wollte ich das Schema anpassen, es hat sich allerdings als komplizerter herausgestellt, als gedacht.
+
+Das Schema was ich mir überlegt hatte, war folgendes:
+```
+
+class Hotel(Base):
+    __tablename__ = 'hotels'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    stars = Column(Integer)
+    rooms = relationship("Room", back_populates="hotel")
+
+
+class Flight(Base):
+    __tablename__ = 'flights'
+
+    id = Column(Integer, primary_key=True)
+    departure_airport = Column(String)
+    arrival_airport = Column(String)
+    departure_datetime = Column(DateTime)
+    arrival_datetime = Column(DateTime)
+    offers = relationship("Booking", back_populates="flight")
+
+
+class Offer(Base):
+    __tablename__ = 'offers'
+
+    id = Column(Integer, primary_key=True)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    flight_id = Column(Integer, ForeignKey('flights.id'))
+    count_adults = Column(Integer)
+    count_children = Column(Integer)
+    price = Column(Float)
+    meal_type = Column(Enum("BREAKFAST", "ALLINCLUSIVE", "HALFBOARD", "NONE", name="meal_type_enum"), nullable=False)
+    hotel = relationship("Hotel", back_populates="offers")
+    flight = relationship("Flight", back_populates="offers")
+
+
+class Room(Base):
+    __tablename__ = 'rooms'
+
+    id = Column(Integer, primary_key=True)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    type = Column(Enum("APARTMENT", "DOUBLE", "STUDIO", "FAMILY", "SUITE", "SINGLE", "ACCORDINGDESCRIPTION", name="room_type_enum"))
+    ocean_view = Column(Boolean)
+    offers = relationship("Booking", back_populates="room")
+```
+Da ich davon zum Beispiel ausgegangen bin, dass sich die Flüge doppeln werden. 
+Es hat sich aber als komolizert erachtet das ```offers.csv```in dieses Schema zu übertragen.
+
+So hat im Moment die Datenbank Tabelle fast gleiche Schema, wie das csv.
+Um eine schnelle suche zu ermöglichen habe einen Indexierung verwendet.
+
+
+## Backend
+
+
+### aktuelle Probleme:
+- Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern querys länger.
+- Server hat kein HTTPS, deshalb kann das deployte Frontend nicht auf das Backend zugreifen.
+
+### Verbesserungen, welche getätigt werden könnten
+- Datenbank Schema anpassen
+
+
+## How to run locally
+
+### Frontend
 
 um das Frontend zu starten folgenden anweisungen folgen:
 https://github.com/timkn/CHECK24-GenDev/tree/main/frontend#developing.
 
-Um zu valiederen, dass wie gewünscht funktioniert kann sich auch das Frontend auf: https://gendev.timknothe.com angesehen werden. Dieses hat aber keinen Backend zugriff. Da der Server (noch) nicht über HTTPS verfügt.
+Um zu valiederen, dass wie gewünscht funktioniert kann sich auch das Frontend auf: https://gendev.timknothe.com angesehen werden. Dort ist immer das aktuelle Frontend deployed, dieses hat aber keinen Zugriff auf das Backend, das Backend (noch) nicht über HTTPS verfügt.
 
-## Backend
+### Backend
 
-das Backend kann per docker compose gestarte werden. Hierbei ist zu beachten, dass dann eine leere Postgres Datenbank mitaufgestzt werden. Darum halte ich es für die beste möglichkiet. Wenn Sie meine credentials benutzen, um zugang zur meiner Datenbank zu bekommen.
+Das Backend kann mithilfe von Docker Compose gestartet werden. 
+Hierbei ist zu beachten, dass eine Postgres Datenbank mitaufgestzt wird. 
+In der jetzigen konfiguration wird diese Datenbank nicht verwendet, sondern eine, welche auf einem Server läuft und die Date enthält.
+
+Alle credentials werden _im Moment_ in dem  ```docker-compose.yml``` File mitgeliefert.
+
+
+
+Bitte kontakieren Sie mich gerne bei Fragen / Problemen 
+```timknothe21@gmail.com```
