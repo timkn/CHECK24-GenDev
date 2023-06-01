@@ -11,6 +11,8 @@
         ToolbarButton,
         Input,
         Button,
+        Spinner,
+        Toast,
     } from 'flowbite-svelte';
     import MultiSelect from 'svelte-multiselect';
     import { DateInput } from 'date-picker-svelte';
@@ -61,6 +63,8 @@
 
     }
 
+    let loading_results = false
+    let results_here = false
 
     let selected = []
 
@@ -83,6 +87,7 @@
 
     let destination = ""
 
+    let noariport = false
 
 
     let ai_response:string = ""
@@ -265,8 +270,10 @@ function mapAirportNameToCode(name: string): string | undefined {
 
 
     let offers = []
+    
 
-    let msg = ""
+    
+
 
 
 
@@ -274,35 +281,45 @@ function mapAirportNameToCode(name: string): string | undefined {
     const close_all= () => items.forEach((_,i)=> items[i] = false)
     const open_all = () => items.forEach((_,i)=> items[i] = true)
 
-        function handleSubmit() {
-            offers = []
-            close_all();
-
-        let airport = mapAirportNameToCode(selected[0]);
-        let dateFrom = date_from.toISOString().substring(0, 10);
-        let dateTo = date_to.toISOString().substring(0, 10);
-        let durationP = duration 
-        let countAdults = counter_adults;
-        let countChildren = counter_children;
-        let host = "http://localhost:8000";
+    function handleSubmit() {
+        close_all();
+        noariport = false;
+        offers = []
 
 
-    
-        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${durationP}&count_adults=${countAdults}&count_children=${countChildren}`;
-
-        fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            offers = data
-            if (offers.length == 0) {
-                msg = "Keine Angebote gefunden"
-            } else {
-                msg = ""
+        if (selected.length == 0) {
+        noariport = true;
+        return
             }
-        }
-        )
-        .catch(error => console.error(error));
+
+
+        loading_results = true;
+        results_here = false;
         
+
+
+    let airport = mapAirportNameToCode(selected[0]);
+    let dateFrom = date_from.toISOString().substring(0, 10);
+    let dateTo = date_to.toISOString().substring(0, 10);
+    let durationP = duration 
+    let countAdults = counter_adults;
+    let countChildren = counter_children;
+    let host = "http://localhost:8000";
+
+
+
+    let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${durationP}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        offers = data;
+        loading_results = false;
+        results_here = true;
+    }
+    )
+    .catch(error => console.error(error));
+    
     }
 
 
@@ -434,17 +451,16 @@ function mapAirportNameToCode(name: string): string | undefined {
 </Accordion>
 
 
+<div class="flex justify-center">
 
-<button on:click={handleSubmit}   type="button"
-        class="m-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-    Los geht's
-    <svg aria-hidden="true" class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20"
-         xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd"
-              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-              clip-rule="evenodd"></path>
-    </svg>
-</button>
+    <Button on:click={handleSubmit}>
+        {#if loading_results}
+            <Spinner class="mr-3" size="4" color="white" />Loading ...
+        {:else}
+            Los geht's
+        {/if}
+    </Button> 
+</div>
 
 <ul class="flex flex-row flex-wrap gap-4 justify-center m-4">
     {#each offers.slice(0, limit) as offer}
@@ -458,10 +474,16 @@ function mapAirportNameToCode(name: string): string | undefined {
     </Button>
 {/if}
 
+{#if offers.length == 0 && results_here}
+    <Alert class="m-8" color="red">
+        <span class="font-medium">Keine Angebote gefunden.</span> Bitte wähle andere Reisedaten.
+    </Alert>
+{/if}
 
-<p>{msg}</p>
 
 
-
-
-
+{#if noariport}
+    <Alert class="m-8" color="red">
+        <span class="font-medium">Kein Flughafen ausgewählt.</span> Bitte wähle einen Flughafen aus.
+    </Alert>
+{/if}

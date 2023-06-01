@@ -23,30 +23,34 @@
         "hotelstars" : 4,
     }
 
+    export let data;
+
+    console.log(data);
+
     let clickOutsideModal = false;
 
 
 </script>
 <Card on:click={() => clickOutsideModal = true}>
   <div class="flex flex-row justify-between items-baseline">
-    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{offer.hotelname}</h5>
-    <Rating id="example-1" total={5} size={20} rating={offer.hotelstars} />
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{data.hotel.name}</h5>
+    <Rating id="example-1" total={5} size={20} rating={data.hotel.stars} />
   </div>
-    <p>{offer.outbounddepartureairport} -  {offer.outboundarrivalairport}, {offer.inbounddepartureairport} - {offer.inboundarrivalairport}</p>
+    <p>{data.outbounddepartureairport} -  {data.outboundarrivalairport}, {data.inbounddepartureairport} - {data.inboundarrivalairport}</p>
     <p>
-      {offer.countadults} Erwachsene -
-      {offer.countchildren} Kind(er) 
+      {data.countadults} Erwachsene -
+      {data.countchildren} Kind(er) 
     </p>
     <p>
-      {offer.outbounddeparturedatetime} - {offer.outboundarrivaldatetime}
-      {offer.inbounddeparturedatetime} - {offer.inboundarrivaldatetime}
+      {data.outbounddeparturedatetime} - {data.outboundarrivaldatetime}
+      {data.inbounddeparturedatetime} - {data.inboundarrivaldatetime}
     </p>
     <div class="flex flex-row justify-between items-baseline">
       <div>
-        <p class="text-1xl font-bold">{offer.mealtype}</p>
+        <p class="text-1xl font-bold">{data.mealtype}</p>
       </div>
       <div class="flex items-baseline text-gray-900 dark:text-white">
-        <span class="text-2xl font-extrabold tracking-tight">{offer.price}</span>
+        <span class="text-2xl font-extrabold tracking-tight">{data.price}</span>
         <span class="text-1xl font-semibold">€</span>
     </div>
     </div>
