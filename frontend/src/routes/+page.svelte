@@ -19,6 +19,7 @@
     import OfferCard from '$lib/OfferCard.svelte';
     import {offset} from '@popperjs/core';
     import {onMount} from 'svelte';
+    import OfferCardHotel from "$lib/OfferCardHotel.svelte";
 
     function calculateDaysBetweenDates(date1: Date, date2: Date) {
         const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
@@ -519,9 +520,9 @@
     </Button>
 </div>
 
-<ul class="flex flex-row flex-wrap gap-4 justify-center m-4">
+<ul class="flex flex-row flex-wrap gap-4 justify-start m-4 justify-items-stretch">
     {#each offers.slice(0, limit) as offer}
-        <OfferCard userData={userData} data={offer}/>
+        <OfferCardHotel userData={userData} data={offer}/>
     {/each}
 </ul>
 
