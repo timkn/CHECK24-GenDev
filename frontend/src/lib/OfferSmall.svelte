@@ -142,7 +142,7 @@
             <p class="my-2">Zimmer:</p>
             <Badge large>{getRoomTypeText(data.roomtype)}</Badge>
 
-            <p class="my-2">Verpfelgung:</p>
+            <p class="my-2">Verpflegung:</p>
             <Badge large>{get_mealtype_text(data.mealtype)}</Badge>
         </div>
 
