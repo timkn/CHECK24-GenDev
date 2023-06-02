@@ -74,6 +74,7 @@
         {name: 'Mallorca', color: 'blue', class: 'm-2'},
         {name: 'Paris', color: 'blue', class: 'm-2'},
         {name: 'Sydney', color: 'blue', class: 'm-2'},
+        {name: 'New York', color: 'blue', class: 'm-2'},
     ]
 
     let search_text = "Ich möchte an den Strand und in die Sonne."
@@ -238,6 +239,9 @@
         }
         if ("mallorca".indexOf(text) !== -1 || text.indexOf("mallorca") !== -1) {
             badges.push({name: 'Mallorca', color: 'blue', class: 'm-2'});
+        }
+        if ("ney york".indexOf(text) !== -1 || text.indexOf("new york") !== -1) {
+            badges.push({name: 'New York', color: 'blue', class: 'm-2'});
         }
 
         console.log(badges)
