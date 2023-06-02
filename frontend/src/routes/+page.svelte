@@ -272,12 +272,27 @@
     const close_all = () => items.forEach((_, i) => items[i] = false)
     const open_all = () => items.forEach((_, i) => items[i] = true)
 
+
+    let childsFail = false;
+    let adultsFail = false;
+
     function handleSubmit() {
         close_all();
         noariport = false;
+        childsFail = false;
+        adultsFail = false;
         offers = []
 
         destination = "Mallorca"
+
+        if (counter_children == null || counter_children < 0 || counter_children > 10|| isNaN(counter_children)) {
+            childsFail = true;
+            return
+        }
+        if (counter_adults == null || counter_adults < 0 || counter_adults > 10 || isNaN(counter_adults)) {
+            adultsFail = true;
+            return
+        }
 
 
         if (selected.length == 0) {
@@ -534,6 +549,19 @@
 {#if noariport}
     <Alert class="m-8" color="red">
         <span class="font-medium">Kein Flughafen ausgewählt.</span> Bitte wähle einen Flughafen aus.
+    </Alert>
+{/if}
+
+{#if childsFail}
+    <Alert class="m-8" color="red">
+        <span class="font-medium">Bitte gib einen gültigen Wert für Anazhal Kinder ein.</span> Bitte gebe eine Zahl ein.
+    </Alert>
+{/if}
+
+
+{#if adultsFail}
+    <Alert class="m-8" color="red">
+        <span class="font-medium">Bitte gib einen gültigen Wert für die Anazhal der Erwachsenen ein.</span> Bitte gebe eine Zahl ein.
     </Alert>
 {/if}
 
