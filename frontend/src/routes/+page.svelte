@@ -89,10 +89,10 @@
 
     let ai_response: string = ""
 
-    const URL = "http://localhost:8000/aisearch"
+    const URL = "http://localhost:8000/gpt_destination_search"
 
     async function ai_search(query: string) {
-        const response = await fetch(`${URL}?query=${query}`);
+        const response = await fetch(`${URL}?user_promt=${query}`);
         const json = await response.json();
         console.log(json);
         return json;

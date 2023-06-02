@@ -1,11 +1,37 @@
 from collections import defaultdict
 
-from sqlalchemy import text
+from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 from datetime import timedelta, date, datetime
 
 from app import models, schemas
+from app.models import Offer, Hotel
 
+def get_all_offer_from_hotel(db: Session, hotelid:int):
+	query = db.query(Offer).filter(Offer.hotelid == hotelid).limit(10)
+
+	results = query.all()
+
+	return results
+
+def get_offers_from_hotel_orm(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str, duration: int, hotelid: int):
+	query = db.query(Offer).distinct().join(Hotel).filter(
+		Offer.outbounddeparturedatetime >= date_from,
+		Offer.inboundarrivaldatetime <= date_to,
+		Offer.hotelid == hotelid,
+		Offer.countadults == count_adults,
+		Offer.countchildren == count_children,
+		Offer.outbounddepartureairport == airport,
+		Hotel.id == Offer.hotelid,
+		text("date_trunc('day', offers_1.inboundarrivaldatetime) - date_trunc('day', offers_1.outbounddeparturedatetime) = interval '{}'".format(duration))
+	)
+
+	results = query.all()
+
+	for i in results:
+		print(i)
+
+	return results
 
 def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int,
 						  airport: str,
@@ -88,6 +114,7 @@ def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: in
 		results.append(result)
 
 	return results
+
 
 def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str,
 			   duration: int):
