@@ -1,12 +1,10 @@
+from collections import defaultdict
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from datetime import timedelta, date, datetime
 
 from app import models, schemas
-
-
-def get_hotel(db: Session, hotel_id: int):
-	return db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
 
 
 def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int,
@@ -58,6 +56,38 @@ def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adu
 	print(results)
 	return results
 
+
+def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str,
+				   duration: int):
+	sql = f"""
+			select h.*, min(o.price) as min from hotels h, offers o
+			where outbounddeparturedatetime >= '{date_from}'
+			AND inboundarrivaldatetime <= '{date_to}'
+			AND countadults={count_adults} AND countchildren={count_children}
+			AND outbounddepartureairport='{airport}'
+			AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval '{duration} days'
+			and h.id = o.hotel_id
+			group by h.id
+			order by min;
+			"""
+
+	res = db.execute(text(sql))
+
+	result_set = res.fetchall()
+
+	print("received res from db")
+
+	results = []
+	for row in result_set:
+		result = {
+			'id': row[0],
+			'name': row[1],
+			'starts': row[2],
+			'price': row[3],
+		}
+		results.append(result)
+
+	return results
 
 def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str,
 			   duration: int):
