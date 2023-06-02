@@ -46,18 +46,10 @@ def ai_search(query: str):
 	return {"response": query}
 
 
-@app.get("/hotels/{hotel_id}/offers", response_model=schemas.Hotel)
-def read_hotel(hotel_id: int, db: Session = Depends(get_db)):
-	db_hotel = crud.get_hotel(db, hotel_id=hotel_id)
-	if db_hotel is None:
-		raise HTTPException(status_code=404, detail="Hotel not found")
-	return db_hotel
-
-
 @app.get("/offers")
 def search_offers(airport: str, date_from: date, date_to: date, duration: int, count_adults: int, count_children: int,
 				  db: Session = Depends(get_db)):
-	offers = crud.get_offers(db, date_from, date_to, count_adults, count_children, airport, duration)
+	offers = crud.get_offers_new(db, date_from, date_to, count_adults, count_children, airport, duration)
 
 	if offers is None:
 		raise HTTPException(status_code=404, detail="Offers not found")
