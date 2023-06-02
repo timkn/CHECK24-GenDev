@@ -12,7 +12,7 @@
         Input,
         Button,
         Spinner,
-        Toast,
+        Toast, Card,
     } from 'flowbite-svelte';
     import MultiSelect from 'svelte-multiselect';
     import {DateInput} from 'date-picker-svelte';
@@ -20,6 +20,10 @@
     import {offset} from '@popperjs/core';
     import {onMount} from 'svelte';
     import OfferCardHotel from "$lib/OfferCardHotel.svelte";
+
+
+    let host = "http://localhost:8000";
+
 
     function calculateDaysBetweenDates(date1: Date, date2: Date) {
         const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
@@ -266,10 +270,7 @@
 
 
     let duration = 7;
-
-
     let offers = []
-
     let userData = {};
 
 
@@ -281,11 +282,36 @@
     let childsFail = false;
     let adultsFail = false;
 
+
+    let showDestinationDescriptionCard = false;
+    let destinationDescriptionCard = {
+        "destination": "",
+        "description": "",
+    }
+
+    function handleDestinationDescriptionCard(destination:string, dateFrom:string, dateTo:string, countAdults:number, countChildren:number) {
+
+
+        let url = `${host}/gpt_destination_description?destination=${destination}&outbounddeparturedatetime=${dateFrom}&inboundarrivaldatetime=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+
+        fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                            destinationDescriptionCard.destination = destination;
+                            destinationDescriptionCard.description = data.response;
+                            showDestinationDescriptionCard = true;
+                        }
+                )
+                .catch(error => console.error(error));
+
+    }
+
     function handleSubmit() {
         close_all();
         noariport = false;
         childsFail = false;
         adultsFail = false;
+        showDestinationDescriptionCard = false;
         offers = []
 
         destination = "Mallorca"
@@ -315,7 +341,6 @@
         let dateTo = date_to.toISOString().substring(0, 10);
         let countAdults = counter_adults;
         let countChildren = counter_children;
-        let host = "http://localhost:8000";
 
         userData = {
             airport: airport,
@@ -335,6 +360,7 @@
                             offers = data;
                             loading_results = false;
                             results_here = true;
+                            handleDestinationDescriptionCard(destination, dateFrom, dateTo, countAdults, countChildren);
                         }
                 )
                 .catch(error => console.error(error));
@@ -379,7 +405,6 @@
         dateTo: "2023-06-20",
         duration: 7
     }
-    
 
 
 </script>
@@ -511,9 +536,7 @@
     </AccordionItem>
 </Accordion>
 
-
 <div class="flex justify-center">
-
     <Button on:click={handleSubmit}>
         {#if loading_results}
             <Spinner class="mr-3" size="4" color="white"/>
@@ -524,9 +547,21 @@
     </Button>
 </div>
 
+
+
 <ul class="flex flex-row flex-wrap gap-4 justify-start m-4 justify-items-stretch">
-    {#each offers.slice(0, limit) as offer}
+    {#each offers.slice(0, limit) as offer, index}
         <OfferCardHotel userData={userData} data={offer}/>
+        {#if index === 0}
+            {#if showDestinationDescriptionCard}
+                <Card>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{destinationDescriptionCard.destination}</h5>
+                    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                        {destinationDescriptionCard.description}
+                    </p>
+                </Card>
+            {/if}
+        {/if}
     {/each}
 </ul>
 
