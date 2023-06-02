@@ -85,6 +85,8 @@ Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwie
 ### Verbesserungen, welche ich mir überlegt habe
 - Datenbank Schema anpassen
 - Redis Cache bei FastAPI implementieren
+ mehr daten anzeigen auf der start seite
+- mehr filtermöglichkeiten bei den angeboten und allen angebiten bei dem hotel
 
 
 ## How to run locally
@@ -93,7 +95,7 @@ Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwie
 
 um das Frontend zu starten folgenden anweisungen folgen:
 https://github.com/timkn/CHECK24-GenDev/tree/main/frontend#developing.
-
+eventell muss https://kit.svelte.dev installiert werden.
 Um zu valiederen, dass wie gewünscht funktioniert kann sich auch das Frontend auf: https://gendev.timknothe.com angesehen werden. Dort ist immer das aktuelle Frontend deployed, dieses hat aber keinen Zugriff auf das Backend, das Backend (noch) nicht über HTTPS verfügt.
 
 ### Backend
