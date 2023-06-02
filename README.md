@@ -62,6 +62,8 @@ So hat im Moment die Datenbank Tabelle fast gleiche Schema, wie das csv.
 Um eine schnelle suche zu ermöglichen habe einen Indexierung verwendet.
 
 
+Im moment query die Daten sehr schnell (100ms - 800ms ist die Zeit der reinen SQL Abfrage), jedoch werden eshalb weniger Informationen auf der startseite angzeigt.
+
 ### Backend
 Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```http://localhost:xxxx/docs``` die Endpointe angeschaut werden.
 FastAPI ist realtiv einfach zu benutzen. 
