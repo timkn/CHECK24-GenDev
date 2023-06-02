@@ -277,6 +277,8 @@
         noariport = false;
         offers = []
 
+        destination = "Mallorca"
+
 
         if (selected.length == 0) {
             noariport = true;
@@ -324,6 +326,40 @@
 
 
     let limit = 30;
+
+
+    const offerDataDummy = {
+        hotelid: 520,
+        outbounddeparturedatetime: '2023-03-04T10:00:00',
+        inbounddeparturedatetime: '2023-03-11T10:00:00',
+        countadults: 2,
+        countchildren: 0,
+        price: 500,
+        inbounddepartureairport: 'JFK',
+        outboundarrivalairport: 'FRA',
+        inboundarrivaldatetime: '2023-03-11T18:00:00',
+        outbounddepartureairport: 'FRA',
+        inboundarrivalairport: 'JFK',
+        outboundarrivaldatetime: '2023-03-04T18:00:00',
+        mealtype: 'All Inclusive',
+        oceanview: true,
+        roomtype: 'Double',
+        hotel: {
+            id: 1,
+            name: 'Hotel A',
+            stars: 4
+        }
+    };
+
+    const userDataDummy = {
+        airport: "CSO",
+        countAdults: 2,
+        countChildren: 0,
+        dateFrom: "2023-06-01",
+        dateTo: "2023-06-20",
+        duration: 7
+    }
+    
 
 
 </script>
@@ -474,8 +510,8 @@
     {/each}
 </ul>
 
-{#if offers.length != 0}
-    <div class="flex justify-center">
+{#if offers.length !== 0}
+    <div class="flex justify-center m-4">
         <Button on:click={() => limit+=30}>
             mehr laden
             <svg aria-hidden="true" class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
@@ -488,7 +524,7 @@
     </div>
 {/if}
 
-{#if offers.length == 0 && results_here}
+{#if offers.length === 0 && results_here}
     <Alert class="m-8" color="red">
         <span class="font-medium">Keine Angebote gefunden.</span> Bitte wähle andere Reisedaten.
     </Alert>
@@ -500,3 +536,7 @@
         <span class="font-medium">Kein Flughafen ausgewählt.</span> Bitte wähle einen Flughafen aus.
     </Alert>
 {/if}
+
+
+
+
