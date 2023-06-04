@@ -7,10 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import models, schemas, crud, controller
 from app.database import engine, SessionLocal
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+import redis
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
 
 origins = [
 	"http://localhost:5173",
@@ -40,7 +43,15 @@ def get_db():
 		db.close()
 
 
+@app.on_event("startup")
+async def startup():
+	redis_instance = redis.Redis(host='localhost', port=6379, username='default',
+								 password='jfhuez8f32fhfqnbef8g29hqnf024', decode_responses=False)
+	FastAPICache.init(RedisBackend(redis_instance), prefix="fastapi-cache")
+
+
 @app.get("/gpt_destination_search")
+@cache(expire=60)
 def ai_search(user_promt: str):
 	gpt_response: dict = controller.gpt_destination_search(user_promt)
 	if gpt_response is None:
@@ -49,8 +60,9 @@ def ai_search(user_promt: str):
 
 
 @app.get("/gpt_destination_description")
-def ai_search(destination: str, outbounddeparturedatetime: date,
-			  inboundarrivaldatetime: date, count_adults: int, count_children: int):
+@cache(expire=60)
+def destination_description(destination: str, outbounddeparturedatetime: date,
+			  inboundarrivaldatetime: date, count_adults: int, count_children: int) -> dict:
 	gpt_response: str = controller.gpt_destination_description(destination, outbounddeparturedatetime,
 															   inboundarrivaldatetime, count_adults, count_children)
 
@@ -60,6 +72,7 @@ def ai_search(destination: str, outbounddeparturedatetime: date,
 
 
 @app.get("/offers")
+@cache(expire=60)
 def search_offers(airport: str, date_from: date, date_to: date, duration: int, count_adults: int, count_children: int,
 				  db: Session = Depends(get_db)):
 	offers = crud.get_offers_new(db, date_from, date_to, count_adults, count_children, airport, duration)
@@ -71,24 +84,12 @@ def search_offers(airport: str, date_from: date, date_to: date, duration: int, c
 
 
 @app.get("/hotel/{hotel_id}/offers")
+@cache(expire=60)
 def search_offers(hotel_id: int, airport: str, date_from: date, date_to: date, duration: int, count_adults: int,
 				  count_children: int,
 				  db: Session = Depends(get_db)):
 	offers = crud.get_offers_from_hotel(db, date_from, date_to, count_adults, count_children, airport, duration,
 										hotel_id)
-
-	if offers is None:
-		raise HTTPException(status_code=404, detail="Offers not found")
-
-	return offers
-
-
-@app.get("/hotel/{hotel_id}/orm")
-def search_offers(hotel_id: int, airport: str, date_from: date, date_to: date, duration: int, count_adults: int,
-				  count_children: int,
-				  db: Session = Depends(get_db)):
-	offers = crud.get_offers_from_hotel_orm(db, date_from, date_to, count_adults, count_children, airport, duration,
-											hotel_id)
 
 	if offers is None:
 		raise HTTPException(status_code=404, detail="Offers not found")

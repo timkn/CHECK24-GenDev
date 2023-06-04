@@ -79,7 +79,6 @@ def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adu
 		}
 		results.append(result)
 
-	print(results)
 	return results
 
 

@@ -12,67 +12,40 @@
         Input,
         Button,
         Spinner,
-        Toast, Card,
+        Card, FloatingLabelInput,
     } from 'flowbite-svelte';
+
+
     import MultiSelect from 'svelte-multiselect';
     import {DateInput} from 'date-picker-svelte';
-    import OfferCard from '$lib/OfferCard.svelte';
-    import {offset} from '@popperjs/core';
     import {onMount} from 'svelte';
     import OfferCardHotel from "$lib/OfferCardHotel.svelte";
+
+    import {getWelcomeText, mapAirportNameToCode} from "../page";
+    import {getAirportList} from "../page.js";
 
 
     let host = "http://localhost:8000";
 
-
-    function calculateDaysBetweenDates(date1: Date, date2: Date) {
-        const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-        const diffInMs = Math.abs(date2.getTime() - date1.getTime());
-        const diffInDays = Math.round(diffInMs / oneDay);
-        return diffInDays;
-    }
-
-
-    function getTimeWelcome() {
-        // Create a new Date object
-        const currentDate: Date = new Date();
-
-        // Get the current hour (0-23)
-        const currentHour: number = currentDate.getHours();
-
-        // Define the threshold values for each phase
-        const morningThreshold: number = 6;     // 6 AM
-        const noonThreshold: number = 12;       // 12 PM
-        const afternoonThreshold: number = 13;  // 1 PM
-        const eveningThreshold: number = 18;    // 6 PM
-        const nightThreshold: number = 22;      // 10 PM
-
-        // Compare the current hour to determine the phase of the day
-        if (currentHour >= morningThreshold && currentHour < noonThreshold) {
-            return 'Guten Morgen!';
-        } else if (currentHour >= noonThreshold && currentHour < afternoonThreshold) {
-            return 'Guten Mittag!';
-        } else if (currentHour >= afternoonThreshold && currentHour < eveningThreshold) {
-            return 'Guten Tag!';
-        } else if (currentHour >= eveningThreshold && currentHour < nightThreshold) {
-            return 'Guten Abend!';
-        } else {
-            return 'Guten Tag!';
-        }
-
-
-    }
-
     let loading_results = false
     let results_here = false
-
-    let selected = []
-
+    let selected = ["Munich Airport"]
     let date_from: Date = new Date()
     let date_to: Date = new Date()
+    date_to.setDate(date_to.getDate() + 8);
+    let counter_children = 0
+    let counter_adults = 2
+
+
+    let destination = ""
+    let noariport = false
+    let ai_response: string = ""
 
 
     let defaultModal = false;
+
+    let search_text = "Ich möchte an den Strand und in die Sonne."
+
 
     let badges = [
         {name: 'Mallorca', color: 'blue', class: 'm-2'},
@@ -81,17 +54,8 @@
         {name: 'New York', color: 'blue', class: 'm-2'},
     ]
 
-    let search_text = "Ich möchte an den Strand und in die Sonne."
-
-    let counter_children = 0
-    let counter_adults = 2
-
-    let destination = ""
-
-    let noariport = false
 
 
-    let ai_response: string = ""
 
     const URL = "http://localhost:8000/gpt_destination_search"
 
@@ -101,123 +65,6 @@
         console.log(json);
         return json;
     }
-
-    const airportFullNames: string[] = [
-        "Amsterdam Airport Schiphol",
-        "Berlin Brandenburg Airport",
-        "Billund Airport",
-        "Bremen Airport",
-        "Bern Airport",
-        "Brussels Airport",
-        "EuroAirport Basel-Mulhouse-Freiburg",
-        "Cologne Bonn Airport",
-        "Brussels South Charleroi Airport",
-        "Copenhagen Airport",
-        "Dresden Airport",
-        "Dortmund Airport",
-        "Düsseldorf Airport",
-        "Eindhoven Airport",
-        "Erfurt-Weimar Airport",
-        "Friedrichshafen Airport",
-        "Karlsruhe/Baden-Baden Airport",
-        "Memmingen Airport",
-        "Münster Osnabrück International Airport",
-        "Frankfurt Airport",
-        "Graz Airport",
-        "Geneva Airport",
-        "Westerland Sylt Airport",
-        "Hanover Airport",
-        "Hamburg Airport",
-        "Frankfurt-Hahn Airport",
-        "Innsbruck Airport",
-        "Klagenfurt Airport",
-        "John Paul II International Airport Kraków-Balice",
-        "Kassel Airport",
-        "Lübeck Airport",
-        "Leipzig/Halle Airport",
-        "Linz Airport",
-        "Luxembourg Airport",
-        "Munich Airport",
-        "Weeze Airport",
-        "Nuremberg Airport",
-        "Paderborn Lippstadt Airport",
-        "Václav Havel Airport Prague",
-        "Rostock-Laage Airport",
-        "Rotterdam The Hague Airport",
-        "Saarbrücken Airport",
-        "Stuttgart Airport",
-        "Strasbourg Airport",
-        "Salzburg Airport",
-        "Vienna International Airport",
-        "Warsaw Chopin Airport",
-        "Zurich Airport",
-    ];
-
-    function mapAirportNameToCode(name: string): string | undefined {
-        const airportMap: { [key: string]: string } = {
-            "Amsterdam Airport Schiphol": "AMS",
-            "Berlin Brandenburg Airport": "BER",
-            "Billund Airport": "BLL",
-            "Bremen Airport": "BRE",
-            "Bern Airport": "BRN",
-            "Brussels Airport": "BRU",
-            "EuroAirport Basel-Mulhouse-Freiburg": "BSL",
-            "Cologne Bonn Airport": "CGN",
-            "Brussels South Charleroi Airport": "CRL",
-            "Copenhagen Airport": "CSO",
-            "Dresden Airport": "DRS",
-            "Dortmund Airport": "DTM",
-            "Düsseldorf Airport": "DUS",
-            "Eindhoven Airport": "EIN",
-            "Erfurt-Weimar Airport": "ERF",
-            "Friedrichshafen Airport": "FDH",
-            "Karlsruhe/Baden-Baden Airport": "FKB",
-            "Memmingen Airport": "FMM",
-            "Münster Osnabrück International Airport": "FMO",
-            "Frankfurt Airport": "FRA",
-            "Graz Airport": "GRZ",
-            "Geneva Airport": "GVA",
-            "Westerland Sylt Airport": "GWT",
-            "Hannover Airport": "HAJ",
-            "Hamburg Airport": "HAM",
-            "Frankfurt-Hahn Airport": "HHN",
-            "Innsbruck Airport": "INN",
-            "Klagenfurt Airport": "KLU",
-            "John Paul II International Airport Kraków-Balice": "KRK",
-            "Kassel Airport": "KSF",
-            "Lübeck Airport": "LBC",
-            "Leipzig/Halle Airport": "LEJ",
-            "Linz Airport": "LNZ",
-            "Luxembourg Airport": "LUX",
-            "Munich Airport": "MUC",
-            "Weeze Airport": "NRN",
-            "Nuremberg Airport": "NUE",
-            "Paderborn Lippstadt Airport": "PAD",
-            "Václav Havel Airport Prague": "PRG",
-            "Rostock-Laage Airport": "RLG",
-            "Rotterdam The Hague Airport": "RTM",
-            "Saarbrücken Airport": "SCN",
-            "Stuttgart Airport": "STR",
-            "Strasbourg Airport": "SXB",
-            "Salzburg Airport": "SZG",
-            "Vienna International Airport": "VIE",
-            "Warsaw Chopin Airport": "WAW",
-            "Zurich Airport": "ZRH",
-        };
-
-        // Convert the name to lowercase and remove leading/trailing whitespace
-        const lowercaseName = name.toLowerCase().trim();
-
-        // Iterate over the airport map entries and find the matching code
-        for (const [airportName, airportCode] of Object.entries(airportMap)) {
-            if (lowercaseName === airportName.toLowerCase()) {
-                return airportCode;
-            }
-        }
-
-        return undefined; // If no match found, return undefined
-    }
-
 
     function getAiData() {
         ai_search(search_text).then((data) => {
@@ -312,6 +159,9 @@
         childsFail = false;
         adultsFail = false;
         showDestinationDescriptionCard = false;
+        destinationDescriptionCard.description = "";
+        destinationDescriptionCard.destination = "";
+
         offers = []
 
         destination = "Mallorca"
@@ -341,6 +191,8 @@
         let dateTo = date_to.toISOString().substring(0, 10);
         let countAdults = counter_adults;
         let countChildren = counter_children;
+
+        console.log(airport)
 
         userData = {
             airport: airport,
@@ -374,44 +226,11 @@
     let limit = 30;
 
 
-    const offerDataDummy = {
-        hotelid: 520,
-        outbounddeparturedatetime: '2023-03-04T10:00:00',
-        inbounddeparturedatetime: '2023-03-11T10:00:00',
-        countadults: 2,
-        countchildren: 0,
-        price: 500,
-        inbounddepartureairport: 'JFK',
-        outboundarrivalairport: 'FRA',
-        inboundarrivaldatetime: '2023-03-11T18:00:00',
-        outbounddepartureairport: 'FRA',
-        inboundarrivalairport: 'JFK',
-        outboundarrivaldatetime: '2023-03-04T18:00:00',
-        mealtype: 'All Inclusive',
-        oceanview: true,
-        roomtype: 'Double',
-        hotel: {
-            id: 1,
-            name: 'Hotel A',
-            stars: 4
-        }
-    };
-
-    const userDataDummy = {
-        airport: "CSO",
-        countAdults: 2,
-        countChildren: 0,
-        dateFrom: "2023-06-01",
-        dateTo: "2023-06-20",
-        duration: 7
-    }
-
-
 </script>
 
 
 <div class="m-6">
-    <p class="m-2 text-lg font-normal text-gray-500 text-center lg:text-xl dark:text-gray-400">{getTimeWelcome()}</p>
+    <p class="m-2 text-lg font-normal text-gray-500 text-center lg:text-xl dark:text-gray-400">{getWelcomeText()}</p>
     <h1 class="m-2 text-4xl font-extrabold leading-none tracking-tight text-gray-00 text-center md:text-xl lg:text-3xl dark:text-white">
         Was sind Ihre nächsten <span
             class="underline underline-offset-3 decoration-4 decoration-blue-400 dark:decoration-blue-600">Urlaubspläne?</span>
@@ -427,7 +246,7 @@
             {/if}
         </span>
         <form>
-            <label for="chat" class="sr-only">Your message</label>
+            <label class="sr-only">Your message</label>
             <Alert color="dark" class="px-3 py-2">
                 <svelte:fragment slot="icon">
                     <Button on:click={() => (defaultModal = true)}>Erklärung</Button>
@@ -488,7 +307,7 @@
             <Badge large>{airport}</Badge>
             {/each}
         </span>
-        <MultiSelect bind:selected options={airportFullNames}/>
+        <MultiSelect bind:selected options={getAirportList()}/>
     </AccordionItem>
     <AccordionItem bind:open={items[2]}>
         <span slot="header" class="flex flex-row gap-4">
@@ -497,20 +316,25 @@
                 - {date_to.toISOString().substring(0, 10)}</p></Badge>
         </span>
         <div class="flex flex-row justify-around">
-            <div class="flex flex-row justify-center items-baseline gap-4">
-                <p>vom</p>
-                <DateInput bind:value={date_from} format="yyyy-MM-dd" placeholder="Select a date"/>
+            <div class="flex flex-row justify-center items-center gap-4">
+                <p>Zeitspanne von</p>
+                <DateInput bind:value={date_from} format="dd.MM.yyyy" placeholder="Select a date"/>
                 <p>bis</p>
-                <DateInput bind:value={date_to} format="yyyy-MM-dd" placeholder="Select a date"/>
+                <DateInput bind:value={date_to} format="dd.MM.yyyy" placeholder="Select a date"/>
                 <p>Dauer:</p>
-                <Input type="text" bind:value={duration} required/>
+                <ButtonGroup>
+                    <Button>7 Tage</Button>
+                    <Button>10 Tage</Button>
+                    <Button>14 Tage</Button>
+                </ButtonGroup>
+                <FloatingLabelInput bind:value={duration} style="outlined" id="floating_outlined" name="floating_outlined" type="number" label="Dauer in Tagen" />
             </div>
 
         </div>
     </AccordionItem>
     <AccordionItem bind:open={items[3]}>
         <span slot="header" class="flex flex-row gap-4">
-            <p>4. weitere Informationen</p>
+            <p>4. abschließende Informationen</p>
             <Badge large>Erwachsene: {counter_adults}</Badge> <Badge large> Kinder: {counter_children}</Badge>
         </span>
         <div class="flex flex-row justify-center items-baseline gap-4">
@@ -518,7 +342,7 @@
             <ButtonGroup>
                 <Button outline color="red" on:click={() => counter_adults > 0 ? counter_adults-- : counter_adults}>-
                 </Button>
-                <Input type="text" id="first_name" bind:value={counter_adults} required/>
+                <Input type="number" id="first_name" bind:value={counter_adults} required/>
                 <Button outline color="green" on:click={() => counter_adults < 20? counter_adults++: counter_adults}>+
                 </Button>
             </ButtonGroup>
@@ -527,45 +351,52 @@
                 <Button outline color="red"
                         on:click={() => counter_children > 0 ? counter_children-- : counter_children}>-
                 </Button>
-                <Input type="text" id="first_name" bind:value={counter_children} required/>
+                <Input type="number" id="first_name" bind:value={counter_children} required/>
                 <Button outline color="green"
                         on:click={() => counter_children < 20 ? counter_children++: counter_children}>+
                 </Button>
             </ButtonGroup>
         </div>
+        <div class="flex justify-center m-4">
+            <Button on:click={handleSubmit}>
+                {#if loading_results}
+                    <Spinner class="mr-3" size="4" color="white"/>
+                    Loading ...
+                {:else}
+                    Suche Angebote
+                {/if}
+            </Button>
+        </div>
     </AccordionItem>
 </Accordion>
 
-<div class="flex justify-center">
-    <Button on:click={handleSubmit}>
-        {#if loading_results}
-            <Spinner class="mr-3" size="4" color="white"/>
-            Loading ...
-        {:else}
-            Los geht's
-        {/if}
-    </Button>
-</div>
 
 
 
-<ul class="flex flex-row flex-wrap gap-4 justify-start m-4 justify-items-stretch">
+
+<ul class="grid grid-cols-3 gap-4 m-8">
     {#each offers.slice(0, limit) as offer, index}
-        <OfferCardHotel userData={userData} data={offer}/>
-        {#if index === 0}
-            {#if showDestinationDescriptionCard}
-                <Card>
+        {#if offers.length >= 3? index === 3: index === 0}
+                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow col-span-3 justify-self-stretch ">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{destinationDescriptionCard.destination}</h5>
-                    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-                        {destinationDescriptionCard.description}
-                    </p>
-                </Card>
-            {/if}
+                        {#if destinationDescriptionCard.description}
+                            <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                                {destinationDescriptionCard.description}
+                            </p>
+                        {:else}
+                            <div class="flex justify-center gap-4 items-center">
+                            <Spinner />
+                            <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                                Beschreibung für Mallorca wird geladen...                            </p>
+                            </div>
+                        {/if}
+                </div>
         {/if}
+        <OfferCardHotel userData={userData} data={offer}/>
     {/each}
 </ul>
 
-{#if offers.length !== 0}
+{#if offers.length !== 0 && results_here && offers.length > limit}
     <div class="flex justify-center m-4">
         <Button on:click={() => limit+=30}>
             mehr laden
