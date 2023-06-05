@@ -1,57 +1,27 @@
-from collections import defaultdict
-
 from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 from datetime import timedelta, date, datetime
 
-from app import models, schemas
-from app.models import Offer, Hotel
-
-def get_all_offer_from_hotel(db: Session, hotelid:int):
-	query = db.query(Offer).filter(Offer.hotelid == hotelid).limit(10)
-
-	results = query.all()
-
-	return results
-
-def get_offers_from_hotel_orm(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str, duration: int, hotelid: int):
-	query = db.query(Offer).distinct().join(Hotel).filter(
-		Offer.outbounddeparturedatetime >= date_from,
-		Offer.inboundarrivaldatetime <= date_to,
-		Offer.hotelid == hotelid,
-		Offer.countadults == count_adults,
-		Offer.countchildren == count_children,
-		Offer.outbounddepartureairport == airport,
-		Hotel.id == Offer.hotelid,
-		text("date_trunc('day', offers_1.inboundarrivaldatetime) - date_trunc('day', offers_1.outbounddeparturedatetime) = interval '{}'".format(duration))
-	)
-
-	results = query.all()
-
-	for i in results:
-		print(i)
-
-	return results
 
 def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int,
 						  airport: str,
 						  duration: int, hotelid: int):
-	sql = f"""
+	SQL_OFFERS_FROM_HOTEL = f"""
 	select distinct *
 		FROM offers_1, hotels
-		where outbounddeparturedatetime >= '{date_from}'
-		AND inboundarrivaldatetime <= '{date_to}'
-		AND hotelid = {hotelid}
-		AND countadults={count_adults} AND countchildren={count_children}
-		AND outbounddepartureairport='{airport}'
+		where outbounddeparturedatetime >= :date_from
+		AND inboundarrivaldatetime <= :date_to
+		AND hotelid = :hotelid
+		AND countadults=:count_adults AND countchildren=:count_children
+		AND outbounddepartureairport=:airport
 		AND hotels.id = offers_1.hotelid
-		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = '{duration} days';
+		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = ':duration days';
 	"""
-	res = db.execute(text(sql))
+	res = db.execute(text(SQL_OFFERS_FROM_HOTEL), {"date_from":date_from, "date_to":date_to, "hotelid":hotelid, "count_adults":count_adults, "count_children":count_children, "airport":airport, "duration":duration})
 
 	result_set = res.fetchall()
 
-	print("received res from db")
+	print("received offers hotel from db")
 
 	results = []
 	for row in result_set:
@@ -86,21 +56,21 @@ def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: in
 				   duration: int):
 	sql = f"""
 			select h.*, min(o.price) as min from hotels h, offers o
-			where outbounddeparturedatetime >= '{date_from}'
-			AND inboundarrivaldatetime <= '{date_to}'
-			AND countadults={count_adults} AND countchildren={count_children}
-			AND outbounddepartureairport='{airport}'
-			AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval '{duration} days'
+			where outbounddeparturedatetime >= :date_from
+			AND inboundarrivaldatetime <= :date_to
+			AND countadults=:count_adults AND countchildren=:count_children
+			AND outbounddepartureairport=:airport
+			AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval ':duration days'
 			and h.id = o.hotel_id
 			group by h.id
 			order by min;
 			"""
 
-	res = db.execute(text(sql))
+	res = db.execute(text(sql), {"date_from":date_from, "date_to":date_to, "count_adults":count_adults, "count_children":count_children, "airport":airport, "duration":duration })
 
 	result_set = res.fetchall()
 
-	print("received res from db")
+	print("received offers from db")
 
 	results = []
 	for row in result_set:
@@ -115,6 +85,7 @@ def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: in
 	return results
 
 
+# not use
 def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str,
 			   duration: int):
 	sql = f"""
@@ -130,7 +101,7 @@ def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, c
 		order by min;
 		"""
 
-	res = db.execute(text(sql))
+	res = db.execute(text(sql), 8)
 
 	result_set = res.fetchall()
 
