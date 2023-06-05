@@ -10,7 +10,7 @@
         TableBodyCell,
         TableBodyRow,
         TableBody,
-        TableHeadCell, TableHead, Table, Heading
+        TableHeadCell, TableHead, Table, Heading, Spinner, Radio
     } from "flowbite-svelte";
     import OfferSmall from "./OfferSmall.svelte";
     import {onMount} from 'svelte';
@@ -20,7 +20,7 @@
 
     let clickOutsideModal = false;
     let offers = [];
-    let loading_results = false;
+    let loading_results = true;
     let results_here = false;
     let host = "http://localhost:8000";
 
@@ -28,32 +28,19 @@
         loading_results = true;
         results_here = false;
 
-        console.log(userData);
-        console.log(data);
-
-
         let url = `${host}/hotel/${data.id}/offers?airport=${userData.airport}&date_from=${userData.dateFrom}&date_to=${userData.dateTo}&duration=${userData.duration}&count_adults=${userData.countAdults}&count_children=${userData.countChildren}`;
 
         fetch(url)
                 .then(response => response.json())
                 .then(data => {
                             offers = data;
+                            sort_by_price_low();
                             loading_results = false;
                             results_here = true;
                         }
                 )
                 .catch(error => console.error(error));
 
-    }
-
-    function toGermanDate(dateString) {
-        const date = new Date(dateString);
-        const formattedDate = date.toLocaleDateString('de-De', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-        }).replace(/\//g, '.');
-        return formattedDate;
     }
 
     function get_persons_text(countAdults, countChildren) {
@@ -73,43 +60,23 @@
         return text;
     }
 
-    function get_mealtype_text(mealtype) {
-        switch (mealtype) {
-            case "NONE":
-                return "Ohne Verpflegung"
-            case "BREAKFAST":
-                return "Frühstück"
-            case "HALFBOARD":
-                return "Halbpension"
-            case "FULLBOARD":
-                return "Vollpension"
-            case "ALLINCLUSIVE":
-                return "All Inclusive"
-            default:
-                return mealtype;
-        }
+    function sort_by_price_low() {
+        offers = offers.sort((a, b) => (a.price > b.price) ? 1 : -1)
     }
 
-    function getRoomTypeText(roomstype) {
-        switch (roomstype) {
-            case "ACCORDINGDESCRIPTION":
-                return "Laut Beschreibung"
-            case "DOUBLE":
-                return "Doppelzimmer"
-            case "SINGLE":
-                return "Einzelzimmer"
-            case "SUITE":
-                return "Suite"
-            case "STUDIO":
-                return "Studio"
-            case "TRIPLE":
-                return "Dreibettzimmer"
-            case "APARTMENT":
-                return "Apartment"
-            default:
-                return roomstype;
-        }
+    function sort_by_price_high() {
+        offers = offers.sort((a, b) => (a.price < b.price) ? 1 : -1)
     }
+
+    function sort_by_date_low() {
+        offers = offers.sort((a, b) => new Date(a.outbounddeparturedatetime) - new Date(b.outbounddeparturedatetime));
+    }
+
+    function sort_by_date_high() {
+        offers = offers.sort((a, b) => new Date(b.outbounddeparturedatetime) - new Date(a.outbounddeparturedatetime));
+    }
+
+
 
 </script>
 <Card on:click={() => {
@@ -139,14 +106,28 @@
     </div>
 </Card>
 
-<Modal title="Alle Angebote" bind:open={clickOutsideModal} size="xl" autoclose outsideclose>
+<Modal title="Alle Angebote" bind:open={clickOutsideModal} size="xl">
     <div class="flex flex-row justify-between items-baseline">
         <Heading tag="h2" class='mb-4 mx-4'>
             <Mark>{data.name}</Mark>
         </Heading>
         <Rating class="mx-4" id="example-1" total={5} size={40} rating={data.stars}/>
     </div>
+
+    <ul class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x divide-gray-200 dark:divide-gray-600">
+        <li class="w-full"><Radio on:click={sort_by_price_high} name="hor-list" class="p-3">Preis (höchster zu erst)</Radio></li>
+        <li class="w-full"><Radio on:click={sort_by_date_low} name="hor-list" class="p-3">Datum (frühstmöglich)</Radio></li>
+        <li class="w-full"><Radio on:click={sort_by_date_high} name="hor-list" class="p-3">Datum (am spätesten)</Radio></li>
+        <li class="w-full"><Radio on:click={sort_by_price_low} name="hor-list" class="p-3">Preis (niedrigster zu erst)</Radio></li>
+    </ul>
+
+
+
+
     <div class="flex flex-row flex-wrap gap-4 justify-center">
+        {#if loading_results}
+            <Spinner />
+        {/if}
         {#each offers as offer}
             <OfferSmall data={offer}></OfferSmall>
         {/each}

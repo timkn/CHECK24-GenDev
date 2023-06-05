@@ -12,7 +12,6 @@
         Input,
         Button,
         Spinner,
-        Card, FloatingLabelInput,
     } from 'flowbite-svelte';
 
 
@@ -21,109 +20,35 @@
     import {onMount} from 'svelte';
     import OfferCardHotel from "$lib/OfferCardHotel.svelte";
 
-    import {getWelcomeText, mapAirportNameToCode} from "../page";
-    import {getAirportList} from "../page.js";
+    import {getBadges, getWelcomeText, mapAirportNameToCode} from "../page";
+    import {getAirportList, toGermanDate} from "../page.js";
 
-
-    let host = "http://localhost:8000";
-
-    let loading_results = false
-    let results_here = false
-    let selected = ["Munich Airport"]
-    let date_from: Date = new Date()
-    let date_to: Date = new Date()
-    date_to.setDate(date_to.getDate() + 8);
-    let counter_children = 0
-    let counter_adults = 2
-
-
+    let HOST = "http://localhost:8000";
+    let loadingOffers = false
+    let isInitailOffers = true;
+    let selectedAirports = ["Munich Airport"]
+    let dateFrom: Date = new Date()
+    let dateTo: Date = new Date()
+    let counterChildren = 0
+    let counterAdults = 2
     let destination = ""
-    let noariport = false
-    let ai_response: string = ""
-
-
-    let defaultModal = false;
-
-    let search_text = "Ich möchte an den Strand und in die Sonne."
-
-
-    let badges = [
-        {name: 'Mallorca', color: 'blue', class: 'm-2'},
-        {name: 'Paris', color: 'blue', class: 'm-2'},
-        {name: 'Sydney', color: 'blue', class: 'm-2'},
-        {name: 'New York', color: 'blue', class: 'm-2'},
-    ]
-
-
-
-
-    const URL = "http://localhost:8000/gpt_destination_search"
-
-    async function ai_search(query: string) {
-        const response = await fetch(`${URL}?user_promt=${query}`);
-        const json = await response.json();
-        console.log(json);
-        return json;
-    }
-
-    function getAiData() {
-        ai_search(search_text).then((data) => {
-            console.log(data.response);
-            ai_response = data.response;
-            searchInAiResponse();
-        }).catch((error) => {
-            console.log(error);
-        });
-    }
-
-
-    function getBadges(text: string) {
-        text = text.toLowerCase()
-
-        badges = []
-
-        if ("sydney".indexOf(text) !== -1 || text.indexOf("sydney") !== -1) {
-            badges.push({name: 'Sydney', color: 'blue', class: 'm-2'});
-        }
-        if ("paris".indexOf(text) !== -1 || text.indexOf("paris") !== -1) {
-            badges.push({name: 'Paris', color: 'blue', class: 'm-2'});
-        }
-        if ("mallorca".indexOf(text) !== -1 || text.indexOf("mallorca") !== -1) {
-            badges.push({name: 'Mallorca', color: 'blue', class: 'm-2'});
-        }
-        if ("ney york".indexOf(text) !== -1 || text.indexOf("new york") !== -1) {
-            badges.push({name: 'New York', color: 'blue', class: 'm-2'});
-        }
-
-        console.log(badges)
-    }
-
-    function searchInSearchText() {
-        getBadges(search_text)
-    }
-
-    function searchInAiResponse() {
-        getBadges(ai_response)
-        console.log(badges)
-    }
-
-    function handleDestination(value: string) {
-        console.log(value)
-        destination = value
-        badges = []
-
-        getBadges(destination)
-    }
-
-
+    let noAirport = false
+    let aiSearchDestinationText: string = ""
+    let explainationAIModal = false;
+    let searchDestinationText = "Ich möchte an den Strand und in die Sonne."
+    let loadingDestinationSearch = false;
     let duration = 7;
     let offers = []
     let userData = {};
+    let limit = 30;
+
+    dateTo.setDate(dateTo.getDate() + 8);
 
 
-    const items = Array(4);
-    const close_all = () => items.forEach((_, i) => items[i] = false)
-    const open_all = () => items.forEach((_, i) => items[i] = true)
+
+    const fromCards = Array(4);
+    const close_all = () => fromCards.forEach((_, i) => fromCards[i] = false)
+    const open_all = () => fromCards.forEach((_, i) => fromCards[i] = true)
 
 
     let childsFail = false;
@@ -136,96 +61,128 @@
         "description": "",
     }
 
-    function handleDestinationDescriptionCard(destination:string, dateFrom:string, dateTo:string, countAdults:number, countChildren:number) {
+
+    let badges = [
+        {name: 'Mallorca', color: 'blue', class: 'm-2'},
+        {name: 'Paris', color: 'blue', class: 'm-2'},
+        {name: 'Sydney', color: 'blue', class: 'm-2'},
+        {name: 'New York', color: 'blue', class: 'm-2'},
+    ]
 
 
-        let url = `${host}/gpt_destination_description?destination=${destination}&outbounddeparturedatetime=${dateFrom}&inboundarrivaldatetime=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
-
-        fetch(url)
+    function destinationSearch() {
+        loadingDestinationSearch = true;
+        fetch(`${HOST}/gpt_destination_search?user_promt=${searchDestinationText}`)
                 .then(response => response.json())
                 .then(data => {
-                            destinationDescriptionCard.destination = destination;
-                            destinationDescriptionCard.description = data.response;
-                            showDestinationDescriptionCard = true;
+                            aiSearchDestinationText = data.response;
+                            updateBadges(aiSearchDestinationText);
+                            loadingDestinationSearch = false;
                         }
                 )
                 .catch(error => console.error(error));
+    }
+
+
+    function updateBadges(text: string) {
+        badges = getBadges(text)
+    }
+
+
+
+    function handleDestination(value: string) {
+        console.log(value)
+        destination = value
+        badges = getBadges(destination)
+    }
+
+
+    function handleDestinationDescriptionCard(destination: string, dateFrom: string, dateTo: string, countAdults: number, countChildren: number) {
+
+
+    let url = `${HOST}/gpt_destination_description?destination=${destination}&outbounddeparturedatetime=${dateFrom}&inboundarrivaldatetime=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+    destinationDescriptionCard.description = "";
+    destinationDescriptionCard.destination = "";
+    fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                        destinationDescriptionCard.destination = destination;
+                        destinationDescriptionCard.description = data.response;
+                        showDestinationDescriptionCard = true;
+                    }
+            )
+            .catch(error => console.error(error));
 
     }
 
     function handleSubmit() {
         close_all();
-        noariport = false;
+        noAirport = false;
         childsFail = false;
         adultsFail = false;
         showDestinationDescriptionCard = false;
-        destinationDescriptionCard.description = "";
-        destinationDescriptionCard.destination = "";
+        limit = 30;
+
 
         offers = []
 
         destination = "Mallorca"
 
-        if (counter_children == null || counter_children < 0 || counter_children > 10|| isNaN(counter_children)) {
+        if (counterChildren == null || counterChildren < 0 || counterChildren > 10 || isNaN(counterChildren)) {
             childsFail = true;
+            open_all();
             return
         }
-        if (counter_adults == null || counter_adults < 0 || counter_adults > 10 || isNaN(counter_adults)) {
+        if (counterAdults == null || counterAdults < 0 || counterAdults > 10 || isNaN(counterAdults)) {
             adultsFail = true;
+            open_all();
+            return
+        }
+
+        if (selectedAirports.length == 0) {
+            noAirport = true;
+            open_all();
             return
         }
 
 
-        if (selected.length == 0) {
-            noariport = true;
-            return
-        }
+        loadingOffers = true;
 
 
-        loading_results = true;
-        results_here = false;
+        let paramAirport = mapAirportNameToCode(selectedAirports[0]);
+        let paramDateFrom = dateFrom.toISOString().substring(0, 10);
+        let paramDateTo = dateTo.toISOString().substring(0, 10);
+        let paramCountAdults = counterAdults;
+        let paramCountChildren = counterChildren;
+        let paramDuration = duration;
+        let paparamDestination = destination;
 
-
-        let airport = mapAirportNameToCode(selected[0]);
-        let dateFrom = date_from.toISOString().substring(0, 10);
-        let dateTo = date_to.toISOString().substring(0, 10);
-        let countAdults = counter_adults;
-        let countChildren = counter_children;
-
-        console.log(airport)
 
         userData = {
-            airport: airport,
-            dateFrom: dateFrom,
-            dateTo: dateTo,
-            duration: duration,
-            countAdults: countAdults,
-            countChildren: countChildren,
+            airport: paramAirport,
+            dateFrom: paramDateFrom,
+            dateTo: paramDateTo,
+            duration: paramDuration,
+            countAdults: paramCountAdults,
+            countChildren: paramCountChildren,
         }
 
 
-        let url = `${host}/offers?airport=${airport}&date_from=${dateFrom}&date_to=${dateTo}&duration=${duration}&count_adults=${countAdults}&count_children=${countChildren}`;
+        let url = `${HOST}/offers?airport=${paramAirport}&date_from=${paramDateFrom}&date_to=${paramDateTo}&duration=${paramDuration}&count_adults=${paramCountAdults}&count_children=${paramCountChildren}`;
 
         fetch(url)
                 .then(response => response.json())
                 .then(data => {
                             offers = data;
-                            loading_results = false;
-                            results_here = true;
-                            handleDestinationDescriptionCard(destination, dateFrom, dateTo, countAdults, countChildren);
+                            loadingOffers = false;
+                            isInitailOffers = false;
+                            handleDestinationDescriptionCard(paparamDestination, paramDateFrom, paramDateTo, paramCountAdults, paramCountChildren);
                         }
                 )
                 .catch(error => console.error(error));
-
     }
 
-
     onMount(open_all);
-
-
-    let limit = 30;
-
-
 </script>
 
 
@@ -238,32 +195,32 @@
 </div>
 
 <Accordion multiple class="m-8">
-    <AccordionItem bind:open={items[0]}>
-        <span slot="header" class="flex flex-row gap-4">
+    <AccordionItem bind:open={fromCards[0]}>
+        <span slot="header" class="flex flex-row gap-4 flex-wrap">
             <p>1. Reiseziehl wählen</p>
             {#if (destination !== "") }
                 <Badge large>{destination}</Badge>
             {/if}
         </span>
         <form>
-            <label class="sr-only">Your message</label>
-            <Alert color="dark" class="px-3 py-2">
+            <Alert color="dark" class="px-3 py-2 flex-wrap">
                 <svelte:fragment slot="icon">
-                    <Button on:click={() => (defaultModal = true)}>Erklärung</Button>
-                    <Modal id="default-modal" title="Terms of Service" bind:open={defaultModal} autoclose>
+                    <Button on:click={() => (explainationAIModal = true)}>Erklärung</Button>
+                    <Modal id="default-modal" title="Terms of Service" bind:open={explainationAIModal} autoclose>
                         <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            Mithife von AI werden dir Urluaborte vorgschlagen
+                            Mithilfe von Künstlicher Intelligenz werden Ihen Urlaubsorte vorgeschlagen.
+                            Probieren Sie zum Beispiel "Ich möchte in eine eine echte Großstadt, aber auch ans Meer" oder "Ich möchte auf eine Insel" oder "Ich möchte in eine historische Weltmetropole".
                         </p>
                         <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            Bitte gebe keine privaten Daten ein.
+                            Bitte geben Sie keine privaten Daten ein.
                         </p>
                         <svelte:fragment slot="footer">
                             <Button on:click={() => console.log('Handle "success"')}>Okay</Button>
                         </svelte:fragment>
                     </Modal>
-                    <Textarea bind:value={search_text} on:input={searchInSearchText} id="chat" class="mx-4" rows="1"
+                    <Textarea bind:value={searchDestinationText} on:input={() => updateBadges(searchDestinationText)} id="chat" class="mx-4" rows="1"
                               placeholder="Suche nach einem Reiseziel oder Frage die AI..."/>
-                    <ToolbarButton on:click={getAiData} type="submit" color="blue"
+                    <ToolbarButton on:click={destinationSearch} type="submit" color="blue"
                                    class="rounded-full text-blue-600 dark:text-blue-500">
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -282,9 +239,15 @@
                     </ToolbarButton>
                 </svelte:fragment>
             </Alert>
-            <p on:change={searchInAiResponse} class="m-4">{ai_response}</p>
+            {#if loadingDestinationSearch}
+                <div class="flex justify-center m-4">
+                    <Spinner />
+                </div>
+                {:else}
+            <p class="m-4">{aiSearchDestinationText}</p>
+            {/if}
         </form>
-        <div class="flex flex-row justify-center gap-4">
+        <div class="flex flex-row justify-center gap-4 flex-wrap">
             {#each badges as badge}
                 <Button outline on:click={() => handleDestination(badge.name)}>
                     {badge.name}
@@ -300,66 +263,66 @@
             {/each}
         </div>
     </AccordionItem>
-    <AccordionItem bind:open={items[1]}>
-        <span slot="header" class="flex flex-row gap-4">
+    <AccordionItem bind:open={fromCards[1]}>
+        <span slot="header" class="flex flex-row gap-4 flex-wrap">
             <p>2. Abflugort wählen</p>
-            {#each selected as airport}
+            {#each selectedAirports as airport}
             <Badge large>{airport}</Badge>
             {/each}
         </span>
-        <MultiSelect bind:selected options={getAirportList()}/>
+        <MultiSelect bind:value={selectedAirports} options={getAirportList()}/>
     </AccordionItem>
-    <AccordionItem bind:open={items[2]}>
-        <span slot="header" class="flex flex-row gap-4">
+    <AccordionItem bind:open={fromCards[2]}>
+        <span slot="header" class="flex flex-row gap-4 flex-wrap">
             <p>3. Zeitraum wählen</p>
-            <Badge large><p>{date_from.toISOString().substring(0, 10)}
-                - {date_to.toISOString().substring(0, 10)}</p></Badge>
+            <Badge large><p>{toGermanDate(dateFrom)} -> {toGermanDate(dateTo)}</p></Badge>
         </span>
         <div class="flex flex-row justify-around">
-            <div class="flex flex-row justify-center items-center gap-4">
+            <div class="flex flex-row justify-center items-center gap-4 flex-wrap">
                 <p>Zeitspanne von</p>
-                <DateInput bind:value={date_from} format="dd.MM.yyyy" placeholder="Select a date"/>
+                <DateInput bind:value={dateFrom} format="dd.MM.yyyy" placeholder="Select a date"/>
                 <p>bis</p>
-                <DateInput bind:value={date_to} format="dd.MM.yyyy" placeholder="Select a date"/>
-                <p>Dauer:</p>
+                <DateInput bind:value={dateTo} format="dd.MM.yyyy" placeholder="Select a date"/>
+                <p>Dauer (Tage):</p>
                 <ButtonGroup>
-                    <Button>7 Tage</Button>
-                    <Button>10 Tage</Button>
-                    <Button>14 Tage</Button>
+                    <Button on:click={() => duration = 7}>7</Button>
+                    <Button on:click={() => duration = 10}>10</Button>
+                    <Button on:click={() => duration = 14}>14</Button>
+                    <Input bind:value={duration} type="number" id="first_name" placeholder="Dauer in Tagen" required  />
+
                 </ButtonGroup>
-                <FloatingLabelInput bind:value={duration} style="outlined" id="floating_outlined" name="floating_outlined" type="number" label="Dauer in Tagen" />
             </div>
 
         </div>
     </AccordionItem>
-    <AccordionItem bind:open={items[3]}>
-        <span slot="header" class="flex flex-row gap-4">
+    <AccordionItem bind:open={fromCards[3]}>
+        <span slot="header" class="flex flex-row gap-4 flex-wrap">
             <p>4. abschließende Informationen</p>
-            <Badge large>Erwachsene: {counter_adults}</Badge> <Badge large> Kinder: {counter_children}</Badge>
+            <Badge large>Erwachsene: {counterAdults}</Badge> <Badge large> Kinder: {counterChildren}</Badge>
         </span>
-        <div class="flex flex-row justify-center items-baseline gap-4">
+        <div class="flex flex-row justify-center items-baseline gap-4 flex-wrap">
             <p>Erwachsene</p>
             <ButtonGroup>
-                <Button outline color="red" on:click={() => counter_adults > 0 ? counter_adults-- : counter_adults}>-
+                <Button outline color="red" on:click={() => counterAdults > 0 ? counterAdults-- : counterAdults}>-
                 </Button>
-                <Input type="number" id="first_name" bind:value={counter_adults} required/>
-                <Button outline color="green" on:click={() => counter_adults < 20? counter_adults++: counter_adults}>+
+                <Input type="number" id="first_name" bind:value={counterAdults} required/>
+                <Button outline color="green" on:click={() => counterAdults < 20? counterAdults++: counterAdults}>+
                 </Button>
             </ButtonGroup>
             <p>Kinder</p>
             <ButtonGroup>
                 <Button outline color="red"
-                        on:click={() => counter_children > 0 ? counter_children-- : counter_children}>-
+                        on:click={() => counterChildren > 0 ? counterChildren-- : counterChildren}>-
                 </Button>
-                <Input type="number" id="first_name" bind:value={counter_children} required/>
+                <Input type="number" id="first_name" bind:value={counterChildren} required/>
                 <Button outline color="green"
-                        on:click={() => counter_children < 20 ? counter_children++: counter_children}>+
+                        on:click={() => counterChildren < 20 ? counterChildren++: counterChildren}>+
                 </Button>
             </ButtonGroup>
         </div>
         <div class="flex justify-center m-4">
             <Button on:click={handleSubmit}>
-                {#if loading_results}
+                {#if loadingOffers}
                     <Spinner class="mr-3" size="4" color="white"/>
                     Loading ...
                 {:else}
@@ -373,30 +336,29 @@
 
 
 
-
-<ul class="grid grid-cols-3 gap-4 m-8">
+<ul class="grid grid-cols-2 gap-4 m-8">
     {#each offers.slice(0, limit) as offer, index}
-        {#if offers.length >= 3? index === 3: index === 0}
-                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow col-span-3 justify-self-stretch ">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{destinationDescriptionCard.destination}</h5>
-                        {#if destinationDescriptionCard.description}
-                            <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-                                {destinationDescriptionCard.description}
-                            </p>
-                        {:else}
-                            <div class="flex justify-center gap-4 items-center">
-                            <Spinner />
-                            <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-                                Beschreibung für Mallorca wird geladen...                            </p>
-                            </div>
-                        {/if}
-                </div>
+        {#if offers.length > 3 ? index === 3 : index === 0}
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow col-span-2 justify-self-stretch">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{destinationDescriptionCard.destination}</h5>
+                {#if destinationDescriptionCard.description}
+                    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                        {destinationDescriptionCard.description}
+                    </p>
+                {:else}
+                    <div class="flex justify-center gap-4 items-center">
+                        <Spinner/>
+                        <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                            Beschreibung für Mallorca wird geladen... </p>
+                    </div>
+                {/if}
+            </div>
         {/if}
         <OfferCardHotel userData={userData} data={offer}/>
     {/each}
 </ul>
 
-{#if offers.length !== 0 && results_here && offers.length > limit}
+{#if offers.length !== 0 && !loadingOffers && offers.length > limit}
     <div class="flex justify-center m-4">
         <Button on:click={() => limit+=30}>
             mehr laden
@@ -410,14 +372,14 @@
     </div>
 {/if}
 
-{#if offers.length === 0 && results_here}
+{#if offers.length === 0 && !loadingOffers && !isInitailOffers}
     <Alert class="m-8" color="red">
         <span class="font-medium">Keine Angebote gefunden.</span> Bitte wähle andere Reisedaten.
     </Alert>
 {/if}
 
 
-{#if noariport}
+{#if noAirport}
     <Alert class="m-8" color="red">
         <span class="font-medium">Kein Flughafen ausgewählt.</span> Bitte wähle einen Flughafen aus.
     </Alert>
@@ -425,14 +387,15 @@
 
 {#if childsFail}
     <Alert class="m-8" color="red">
-        <span class="font-medium">Bitte gib einen gültigen Wert für Anazhal Kinder ein.</span> Bitte gebe eine Zahl ein.
+        <span class="font-medium">Bitte gib einen gültigen Wert für Anzahl Kinder ein.</span> Bitte gebe eine Zahl ein / max 20.
     </Alert>
 {/if}
 
 
 {#if adultsFail}
     <Alert class="m-8" color="red">
-        <span class="font-medium">Bitte gib einen gültigen Wert für die Anazhal der Erwachsenen ein.</span> Bitte gebe eine Zahl ein.
+        <span class="font-medium">Bitte gib einen gültigen Wert für die Anzahl der Erwachsenen ein.</span> Bitte gebe
+        eine Zahl ein / max 20.
     </Alert>
 {/if}
 

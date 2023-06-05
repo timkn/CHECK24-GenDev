@@ -77,17 +77,22 @@ Beim Frontend war mir wichtig, dass die UI realtiv schön ist aber vor Allem, da
 
 ### Funktionen
 #### OpenAI
-- Ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. Um die anderen Reiseziele zu Testen kann man Beispielsweise: "Großstadturlaub am Meer" suchen.
+- Ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. Um die anderen Reiseziele zu Testen kann man Beispielsweise: "Großstadturlaub am Meer", "Ich möchte in eine historische Stadt" suchen.
 Aber finde die Funktion trozdem eine gute Idee, deshalb habe ich diese drin gelassen.
 
 - Ich habe noch eine weitere Funktion mit OpenAI implementiert, diese generiert auf Basis des Reiseziels, Datums und der Anzahl der Personen einen Reiseempfehlung. Diesee wird zwischen den Offers angezeigt.
+- Für die genaue Funktionsweise und die predefined Promts siehe controller.py
 
-_Note: Die OpenAI API ist relativ langsam, daher dauern diese Funktionen immer etwas._
+- _Note: Die OpenAI API ist relativ langsam, daher dauern diese Funktionen immer etwas._
 
 ### Optimierungen
 Optimierungen der Geschwindigkeit:
 - Datenbankindexierung
 - Datanbankabfragen werden mithilfe von Redis gecached
+- OpenAI Abfragen werden mithilfe von Redis gecached
+
+Optimierungen
+- Docker
 
 ### Hinweise
 - es wird nur ein Aiport pro Suche unterstützt

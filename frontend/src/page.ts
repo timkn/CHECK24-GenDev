@@ -136,3 +136,30 @@ export function mapAirportNameToCode(name: string): string | undefined {
 
     return airportMap[name.trim()];
 }
+
+
+export function getBadges(text: string) {
+    text = text.toLowerCase()
+
+    let badges = []
+
+    if ("sydney".indexOf(text) !== -1 || text.indexOf("sydney") !== -1) {
+        badges.push({name: 'Sydney', color: 'blue', class: 'm-2'});
+    }
+    if ("paris".indexOf(text) !== -1 || text.indexOf("paris") !== -1) {
+        badges.push({name: 'Paris', color: 'blue', class: 'm-2'});
+    }
+    if ("mallorca".indexOf(text) !== -1 || text.indexOf("mallorca") !== -1) {
+        badges.push({name: 'Mallorca', color: 'blue', class: 'm-2'});
+    }
+    if ("ney york".indexOf(text) !== -1 || text.indexOf("new york") !== -1) {
+        badges.push({name: 'New York', color: 'blue', class: 'm-2'});
+    }
+
+    return badges
+}
+
+
+export function toGermanDate(date: Date) {
+    return date.toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
