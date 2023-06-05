@@ -1,12 +1,13 @@
 # CHECK24-GenDev
 
 Dieses Projekt ist Teil der CHECK24 GenDev Holiday Challenge.
-Die App besteht aus einem SvelteKit Frontend, einem FastAPI Backend mit einer PostgreSQL Datenbank.
+Die App besteht aus einem SvelteKit Frontend, einem FastAPI Backend mit einer PostgreSQL Datenbank, sowie einem Redis Cache.
 
 ## About
 
 
 ### Datenbank
+PostgreSQL Datenbank mit 2 Tabellen: ```hotels``` und ```offers```.
 Die Daten wurden mit dem gleichen Schema, wie des der CSV Datei in die Datenanbank geladen.
 Ursprünglich wollte ich das Schema anpassen, es hat sich allerdings als komplizerter herausgestellt, als gedacht.
 
@@ -66,29 +67,38 @@ Im moment query die Daten sehr schnell (100ms - 800ms ist die Zeit der reinen SQ
 
 ### Backend
 Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```http://localhost:xxxx/docs``` die Endpointe angeschaut werden.
-FastAPI ist realtiv einfach zu benutzen. 
+
+#### Cache
+FastAPI nutzt einen Redis Cache um OpenAI Abfragen und Datenbank Abfragen zwischenzuspeichern. Dieser ist zu Demozwecken auf 1 Minute eingestellt. Mir ist auchgefallen, dass die Datenabank schon sehr gut selber cached, aber bei der OpenAI API ist es sehr hilfreich. Das wäre auch für ein Real-World Szenario sehr hilfreich, um bei der OpenAI API Kosten zu optimieren.
 
 ### Frontend
-Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite.
+Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite. 
+Beim Frontend war mir wichtig, dass die UI realtiv schön ist aber vor Allem, dass das Nutzerinterface klar verständlich ist.
 
 ### Funktionen
-- #### OpenAI
-    ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. 
-    Aber ich es trozdem eine gute Idee, deshalb habe ich sie drin gelassen.
+#### OpenAI
+- Ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. Um die anderen Reiseziele zu Testen kann man Beispielsweise: "Großstadturlaub am Meer" suchen.
+Aber finde die Funktion trozdem eine gute Idee, deshalb habe ich diese drin gelassen.
 
+- Ich habe noch eine weitere Funktion mit OpenAI implementiert, diese generiert auf Basis des Reiseziels, Datums und der Anzahl der Personen einen Reiseempfehlung. Diesee wird zwischen den Offers angezeigt.
 
-### Honweise
+_Note: Die OpenAI API ist relativ langsam, daher dauern diese Funktionen immer etwas._
+
+### Optimierungen
+Optimierungen der Geschwindigkeit:
+- Datenbankindexierung
+- Datanbankabfragen werden mithilfe von Redis gecached
+
+### Hinweise
 - es wird nur ein Aiport pro Suche unterstützt
 
 ### aktuelle Probleme:
-- Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern querys länger.
+- Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern die querys eventuell länger.
 - Server hat kein HTTPS, deshalb kann das deployte Frontend nicht auf das Backend zugreifen.
 
 ### Verbesserungen, welche ich mir überlegt habe
 - Datenbank Schema anpassen
-- Redis Cache bei FastAPI implementieren
- mehr daten anzeigen auf der start seite
-- mehr filtermöglichkeiten bei den angeboten und allen angebiten bei dem hotel
+- mehr Filtermöglichkeiten bei den Angeboten und allen Angeboten von einem Hotel
 
 
 ## How to run locally
@@ -108,7 +118,9 @@ In der jetzigen konfiguration wird diese Datenbank nicht verwendet, sondern eine
 
 Alle credentials werden _im Moment_ in dem  ```docker-compose.yml``` File mitgeliefert.
 
+_CORS ist im Moment so eingestellt, dass alle IPs erlaubt sind. Dies ist für die Entwicklung sehr hilfreich, sollte aber in einem Real-World Szenario angepasst werden._
 
+Es sollte deshalb eigentlich keine CORS Probleme geben, ansonsten kontakieren Sie mich gerne.
 
 Bitte kontakieren Sie mich gerne bei Fragen / Problemen 
 ```timknothe21@gmail.com```
