@@ -56,17 +56,17 @@ class Room(Base):
     ocean_view = Column(Boolean)
     offers = relationship("Booking", back_populates="room")
 ```
-Da ich davon zum Beispiel ausgegangen bin, dass sich die Flüge doppeln werden. 
-Es hat sich aber als komolizert erachtet das ```offers.csv```in dieses Schema zu übertragen.
+Da ich davon ausgegangen bin, dass sich z.B. die Flüge doppeln werden. 
+Es hat sich aber als komplizert erachtet das ```offers.csv```in dieses Schema zu übertragen.
 
-So hat im Moment die Datenbank Tabelle fast gleiche Schema, wie das csv.
-Um eine schnelle suche zu ermöglichen habe einen Indexierung verwendet.
+So hat im Moment die Datenbank fast gleiche Schema, wie das csv.
+Um eine schnelle suche zu ermöglichen habe eine Indexierung verwendet.
 
 
-Im moment query die Daten sehr schnell (100ms - 800ms ist die Zeit der reinen SQL Abfrage), jedoch werden eshalb weniger Informationen auf der startseite angzeigt.
+Im moment query die Daten sehr schnell (100ms - 800ms ist die Zeit der reinen SQL Abfrage), jedoch werden deshalb weniger Informationen auf der Startseite angzeigt.
 
 ### Backend
-Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```http://localhost:xxxx/docs``` die Endpointe angeschaut werden.
+Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```http://localhost:xxxx/docs``` die doku der Endpointe angeschaut werden.
 
 #### Cache
 FastAPI nutzt einen Redis Cache um OpenAI Abfragen und Datenbank Abfragen zwischenzuspeichern. Dieser ist zu Demozwecken auf 1 Minute eingestellt. Mir ist auchgefallen, dass die Datenabank schon sehr gut selber cached, aber bei der OpenAI API ist es sehr hilfreich. Das wäre auch für ein Real-World Szenario sehr hilfreich, um bei der OpenAI API Kosten zu optimieren.
@@ -75,7 +75,7 @@ FastAPI nutzt einen Redis Cache um OpenAI Abfragen und Datenbank Abfragen zwisch
 Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite. 
 Beim Frontend war mir wichtig, dass die UI realtiv schön ist aber vor Allem, dass das Nutzerinterface klar verständlich ist.
 
-### Funktionen
+### weitere Funktionen
 #### OpenAI
 - Ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. Um die anderen Reiseziele zu Testen kann man Beispielsweise: "Großstadturlaub am Meer", "Ich möchte in eine historische Stadt" suchen.
 Aber finde die Funktion trozdem eine gute Idee, deshalb habe ich diese drin gelassen.
@@ -85,25 +85,28 @@ Aber finde die Funktion trozdem eine gute Idee, deshalb habe ich diese drin gela
 
 - _Note: Die OpenAI API ist relativ langsam, daher dauern diese Funktionen immer etwas._
 
+#### Filter
+- Bei allen Angeboten eines Hotels kann nach Preis, sowie Datum gefiltert werden.
+
 ### Optimierungen
 Optimierungen der Geschwindigkeit:
 - Datenbankindexierung
 - Datanbankabfragen werden mithilfe von Redis gecached
 - OpenAI Abfragen werden mithilfe von Redis gecached
 
-Optimierungen
+weitere ptimierungen
 - Docker
 
 ### Hinweise
-- es wird nur ein Aiport pro Suche unterstützt
+- es wird aktuell nur ein Airport pro Suche unterstützt
 
 ### aktuelle Probleme:
 - Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern die querys eventuell länger.
-- Server hat kein HTTPS, deshalb kann das deployte Frontend nicht auf das Backend zugreifen.
+- Server hat kein HTTPS, deshalb kann das bereits deployte Frontend nicht auf das Backend zugreifen.
 
 ### Verbesserungen, welche ich mir überlegt habe
 - Datenbank Schema anpassen
-- mehr Filtermöglichkeiten bei den Angeboten und allen Angeboten von einem Hotel
+- weitere Filter-Möglichkeiten
 
 
 ## How to run locally
