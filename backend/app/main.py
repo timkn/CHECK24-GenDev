@@ -43,6 +43,10 @@ def get_db():
 		db.close()
 
 
+@app.get("/")
+def welcome():
+	return "<a href=\"/docs\">Docs</a>"
+
 @app.on_event("startup")
 async def startup():
 	redis_instance = redis.Redis(host='localhost', port=6379, username='default',

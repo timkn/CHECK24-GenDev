@@ -85,7 +85,7 @@ def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: in
 	return results
 
 
-# not use
+# no longer in use
 def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, count_children: int, airport: str,
 			   duration: int):
 	sql = f"""
