@@ -1,10 +1,13 @@
-<style>
+<script>
+    import {Heading} from "flowbite-svelte";
+</script>
 
+<style>
 
     nav {
         display: flex;
         justify-content: center;
-        background-color: #07102e;
+        background-color: #063773;
         padding: 1rem;
 
     }
@@ -17,10 +20,9 @@
 
     }
 
-
 </style>
 
 
 <nav>
-    <h1>Check24X</h1>
+    <h1 class="text-4xl font-extrabold">Check24X</h1>
 </nav>

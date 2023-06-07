@@ -11,7 +11,7 @@
         ToolbarButton,
         Input,
         Button,
-        Spinner,
+        Spinner
     } from 'flowbite-svelte';
 
 
@@ -338,7 +338,7 @@
 
 <ul class="grid grid-cols-2 gap-4 m-8">
     {#each offers.slice(0, limit) as offer, index}
-        {#if offers.length > 3 ? index === 3 : index === 0}
+        {#if offers.length > 3 ? index === 2 : index === 0}
             <div class="p-6 bg-white border border-gray-200 rounded-lg shadow col-span-2 justify-self-stretch">
                 <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{destinationDescriptionCard.destination}</h5>
                 {#if destinationDescriptionCard.description}
