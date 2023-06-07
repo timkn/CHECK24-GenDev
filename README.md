@@ -98,7 +98,7 @@ Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL ```htt
 FastAPI nutzt einen Redis Cache um OpenAI Abfragen und Datenbank Abfragen zwischenzuspeichern. Dieser ist zu Demozwecken auf 1 Minute eingestellt. Mir ist auchgefallen, dass die Datenabank schon sehr gut selber cached, aber bei der OpenAI API ist es sehr hilfreich. Das wäre auch für ein Real-World Szenario sehr hilfreich, um bei der OpenAI API Kosten zu optimieren.
 
 ### Frontend
-Das Frontend ist in SvelteKit geschrieben. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite. 
+Das Frontend benutzt das Framework SvelteKit. SvelteKit basiert auf Svelte, bietet aber Server Side Rendering und Funktionen wie Routing out of the Box.  Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite. 
 Beim Frontend war mir wichtig, dass die UI realtiv schön ist aber vor Allem, dass das Nutzerinterface klar verständlich ist.
 
 ### weitere Funktionen
