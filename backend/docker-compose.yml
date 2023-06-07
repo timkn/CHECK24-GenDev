@@ -6,13 +6,15 @@ services:
   web:
     build: .
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
-    environment:
-       - DATABASE_URL=postgresql://postgres:hfieufh8f39f9fb3uzfg839fh3f3@144.24.175.18:5432/gendev
-       - OPENAI_KEY=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
     volumes:
       - .:/app
     ports:
       - "8000:8000"
+    expose:
+      - 8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:hfieufh8f39f9fb3uzfg839fh3f3@144.24.175.18:5432/gendev
+      - OPENAI_KEY=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
     depends_on:
       - db
       - redis
