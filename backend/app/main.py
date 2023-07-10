@@ -3,6 +3,7 @@ from datetime import datetime, date
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import RedirectResponse
 
 from app import models, schemas, crud, controller
 from app.database import engine, SessionLocal
@@ -12,6 +13,9 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 import redis
 models.Base.metadata.create_all(bind=engine)
+
+CACHE_TIME = 60*60
+
 
 app = FastAPI()
 
@@ -45,7 +49,8 @@ def get_db():
 
 @app.get("/")
 def welcome():
-	return "<a href=\"/docs\">Docs</a>"
+	return RedirectResponse("/docs", status_code=303)
+
 
 @app.on_event("startup")
 async def startup():
@@ -55,7 +60,7 @@ async def startup():
 
 
 @app.get("/gpt_destination_search")
-@cache(expire=60)
+@cache(expire=CACHE_TIME)
 def ai_search(user_promt: str):
 	gpt_response: dict = controller.gpt_destination_search(user_promt)
 	if gpt_response is None:
@@ -64,7 +69,7 @@ def ai_search(user_promt: str):
 
 
 @app.get("/gpt_destination_description")
-@cache(expire=60)
+@cache(expire=CACHE_TIME)
 def destination_description(destination: str, outbounddeparturedatetime: date,
 			  inboundarrivaldatetime: date, count_adults: int, count_children: int) -> dict:
 	gpt_response: str = controller.gpt_destination_description(destination, outbounddeparturedatetime,
@@ -76,7 +81,7 @@ def destination_description(destination: str, outbounddeparturedatetime: date,
 
 
 @app.get("/offers")
-@cache(expire=60)
+@cache(expire=CACHE_TIME)
 def search_offers(airport: str, date_from: date, date_to: date, duration: int, count_adults: int, count_children: int,
 				  db: Session = Depends(get_db)):
 	offers = crud.get_offers_new(db, date_from, date_to, count_adults, count_children, airport, duration)
@@ -88,7 +93,7 @@ def search_offers(airport: str, date_from: date, date_to: date, duration: int, c
 
 
 @app.get("/hotel/{hotel_id}/offers")
-@cache(expire=60)
+@cache(expire=CACHE_TIME)
 def search_offers(hotel_id: int, airport: str, date_from: date, date_to: date, duration: int, count_adults: int,
 				  count_children: int,
 				  db: Session = Depends(get_db)):
