@@ -23,7 +23,7 @@
     import {getBadges, getWelcomeText, mapAirportNameToCode} from "../page";
     import {getAirportList, toGermanDate} from "../page.js";
 
-    let HOST = "http://localhost:8000";
+    let HOST = "https://apigendev.timknothe.com";
     let loadingOffers = false
     let isInitailOffers = true;
     let selectedAirports = ["Munich Airport"]
