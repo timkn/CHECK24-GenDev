@@ -399,6 +399,9 @@
     </Alert>
 {/if}
 
+<Alert class="m-8" color="red">
+    <span class="font-medium">Die Suche ist zur Zeit nicht verfügbar.</span> Search is currently unavailable.
+</Alert>
 
 
 
