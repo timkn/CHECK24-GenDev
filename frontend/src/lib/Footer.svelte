@@ -1,15 +1,8 @@
 <script>
-  import githubLogoWhite from "$lib/assets/github-mark-white.png";
-  import githubLogoBlack from "$lib/assets/github-mark.png";
-  import check24Logo from "$lib/assets/Logo_CHECK24.png";
   import {
     A,
-    Button,
     Footer,
-    FooterBrand,
     FooterCopyright,
-    FooterIcon,
-    FooterLink,
     FooterLinkGroup,
     P,
   } from "flowbite-svelte";
