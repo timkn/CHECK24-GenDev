@@ -1,22 +1,24 @@
 # CHECK24-GenDev
 
-Dieses Projekt ist Teil der CHECK24 GenDev Holiday Challenge.
-Die App besteht aus einem SvelteKit Frontend, einem FastAPI Backend mit einer PostgreSQL Datenbank, sowie einem Redis Cache.
+This project is part of the CHECK24 GenDev Holiday Challenge.
+The app is built with a SvelteKit frontend, a FastAPI backend interfaced with a PostgreSQL database, and also incorporates a Redis cache for performance enhancement.
 
 ## About
 
-### Datenbank
+### Database
 
-PostgreSQL Datenbank mit 2 genutzten Tabellen: `hotels` und `offers_1`.
-Die Daten wurden mit dem gleichen Schema, wie des der CSV Datei in die Datenanbank geladen.
-Ursprünglich wollte ich das Schema anpassen, es hat sich allerdings als komplizerter herausgestellt, als gedacht.
+PostgreSQL database with 2 utilized tables: `hotels` and `offers_1`.
+The data was loaded into the database with the same schema as that of the CSV file.
 
-So hat im Moment die Datenbank fast gleiche Schema, wie das csv.
-Um eine schnelle suche zu Ermöglichen habe eine Indexierung verwendet mittels B-Tree verwendet. Der konkrete Index lautet:
+To enable a quick search, I used an indexing method using a B-Tree. The specific index is:
+
+<details> 
+<summary>index</summary>
 `"idx_offers_optimized_new_2" btree (outbounddepartureairport, countadults, countchildren, outbounddeparturedatetime, inboundarrivaldatetime, hotelid DESC)`
+</details>
 
-Des weiteren sieht die aktuelle Offers Table Folgendermaßen aus:
-
+<details>
+  <summary>offers table</summary>
 ```
                                  Table "public.offers_1"
           Column           |            Type             | Collation | Nullable | Default
@@ -40,61 +42,53 @@ Indexes:
     "idx_offers_optimized_new_2" btree (outbounddepartureairport, countadults, countchildren, outbounddeparturedatetime, inboundarrivaldatetime, hotelid DESC)
 ```
 
-Als weitere optimierung habe ich `outbounddeparturedatetime` und `inbounddeparturedatetime` in einen timestamp umgewandelt um die Daten besser zu vergleichen zu können.
-
-Im moment query die Daten sehr schnell (100ms - 800ms ist die Zeit der reinen SQL Abfrage), jedoch werden deshalb weniger Informationen auf der Startseite angzeigt.
+</details>
 
 ### Backend
 
 Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL `http://localhost:xxxx/docs` die doku der Endpointe angeschaut werden.
 
-#### Cache
+### Cache
 
-FastAPI nutzt einen Redis Cache um OpenAI Abfragen und Datenbank Abfragen zwischenzuspeichern. Dieser ist zu Demozwecken auf 1 Minute eingestellt. Mir ist auchgefallen, dass die Datenabank schon sehr gut selber cached, aber bei der OpenAI API ist es sehr hilfreich. Das wäre auch für ein Real-World Szenario sehr hilfreich, um bei der OpenAI API Kosten zu optimieren.
+FastAPI uses a Redis cache to temporarily store results from OpenAI queries and database queries. The database itself already does a good job at caching, but the Redis cache proves to be very helpful when working with the OpenAI API. This would be extremely advantageous in a real-world scenario, to optimize costs associated with using the OpenAI API.
 
 ### Frontend
 
-Das Frontend benutzt das Framework SvelteKit. SvelteKit basiert auf Svelte, bietet aber Server Side Rendering und Funktionen wie Routing out of the Box. Für das Styling benutze ich überwiegend TailwindCSS und die Componenten von Flowbite.
-Beim Frontend war mir wichtig, dass die UI realtiv schön ist aber vor Allem, dass das Nutzerinterface klar verständlich ist.
+The frontend utilizes the SvelteKit framework. SvelteKit is built on Svelte, but offers server-side rendering and features like routing out of the box. For styling, I predominantly use TailwindCSS and Flowbite's components.
+When designing the frontend, it was important to me that the UI is relatively pleasing, but most importantly, the user interface is clear and easily understandable.
 
-### weitere Funktionen
+### Additional Features
 
 #### OpenAI
 
-- Ich bin am Anfang davon ausgegangen, dass es mehere Reisezeile gibt, deshalb habe ich mir eine Funtion überlegt, wie der Nutzer leichter nach Zielen suchen kann. In dem Suchfeld, kann er nicht nur Reiseziele wie Mallorca oder Paris suchen sondern auch nach Eigenschaften wie Strand etc. Beispielsweise kann nach "Ich möchte an den Strand" gesucht werden. Um die anderen Reiseziele zu Testen kann man Beispielsweise: "Großstadturlaub am Meer", "Ich möchte in eine historische Stadt" suchen.
-  Aber finde die Funktion trozdem eine gute Idee, deshalb habe ich diese drin gelassen.
+- Initially, I assumed that there would be multiple travel destinations, so I devised a function that would make it easier for the user to search for targets. In the search field, the user can not only search for destinations like Mallorca or Paris, but also for features like a beach, etc. For example, they can search for "I want to go to the beach". To test other destinations, you could search for "City break by the sea", "I want to go to a historical city", etc. However, I still think the function is a good idea, so I kept it in.
 
-- Ich habe noch eine weitere Funktion mit OpenAI implementiert, diese generiert auf Basis des Reiseziels, Datums und der Anzahl der Personen einen Reiseempfehlung. Diesee wird zwischen den Offers angezeigt.
-- Für die genaue Funktionsweise und die predefined Promts siehe controller.py
+- I implemented another function with OpenAI. This generates a travel recommendation based on the destination, date, and number of people. This recommendation is displayed between the offers.
+- For detailed functionality and the predefined prompts, see controller.py.
 
-- _Note: Die OpenAI API ist relativ langsam, daher dauern diese Funktionen immer etwas._
+_Note: The OpenAI API is relatively slow, so these functions always take a bit of time._
 
-#### Filter
+#### Filter: hotel offer page
 
-- Bei allen Angeboten eines Hotels kann nach Preis, sowie Datum gefiltert werden.
+- On the page for all offers of a hotel, you can filter by price and date, in both ascending and descending order.
 
-### Optimierungen
+### Optimizations
 
-Optimierungen der Geschwindigkeit:
+Speed:
 
-- Datenbankindexierung
-- Datanbankabfragen werden mithilfe von Redis gecached
-- OpenAI Abfragen werden mithilfe von Redis gecached
+- Database indexing
+- Database queries are cached using Redis
+- OpenAI queries are cached using Redis
 
-weitere ptimierungen
+Further optimizations:
 
 - Docker
 
-### Hinweise
+### Notes
 
-- es wird aktuell nur ein Airport pro Suche unterstützt
+- currently, only one airport per search is supported
 
-### aktuelle Probleme:
+### Improvements that could be implemented
 
-- Die Datenbank enthält viele Duplikate, ich versuche das im Moment zu lösen, indem ich die Datenbank neu aufsetzte oder die Duplikate manuell entferne. Dadurch dauern die querys eventuell länger.
-- Server hat kein HTTPS, deshalb kann das bereits deployte Frontend nicht auf das Backend zugreifen.
-
-### Verbesserungen, welche ich mir überlegt habe
-
-- Datenbank Schema anpassen
-- weitere Filter-Möglichkeiten
+- Adjusting the database schema
+- Additional filter options for search
