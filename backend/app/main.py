@@ -14,7 +14,7 @@ from fastapi_cache.decorator import cache
 import redis
 models.Base.metadata.create_all(bind=engine)
 
-CACHE_TIME = 60*60
+CACHE_TIME = 120*60 # min * sec = 2h
 
 
 app = FastAPI()
