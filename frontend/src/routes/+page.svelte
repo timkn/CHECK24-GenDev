@@ -193,7 +193,6 @@
             class="underline underline-offset-3 decoration-4 decoration-blue-400 dark:decoration-blue-600">Urlaubspläne?</span>
     </h1>
 </div>
-
 <Accordion multiple class="m-8">
     <AccordionItem bind:open={fromCards[0]}>
         <span slot="header" class="flex flex-row gap-4 flex-wrap">
@@ -275,7 +274,7 @@
     <AccordionItem bind:open={fromCards[2]}>
         <span slot="header" class="flex flex-row gap-4 flex-wrap">
             <p>3. Zeitraum wählen</p>
-            <Badge large><p>{toGermanDate(dateFrom)} -> {toGermanDate(dateTo)}</p></Badge>
+            <Badge large><p>{toGermanDate(dateFrom)} → {toGermanDate(dateTo)}</p></Badge>
         </span>
         <div class="flex flex-row justify-around">
             <div class="flex flex-row justify-center items-center gap-4 flex-wrap">
