@@ -44,7 +44,7 @@ services:
       - "6379:6379"
     expose:
       - 6379
-    command: redis-server --save 20 1 --loglevel warning --requirepass jfhuez8f32fhfqnbef8g29hqnf024
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
 
