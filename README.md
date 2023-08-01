@@ -1,6 +1,6 @@
 # CHECK24-GenDev
 
-This project is part of the CHECK24 GenDev Holiday Challenge.
+This project is part of the [CHECK24 GenDev Holiday Challenge](https://github.com/check24-scholarships/holiday-challenge).
 The app is built with a SvelteKit frontend, a FastAPI backend interfaced with a PostgreSQL database, and also incorporates a Redis cache for performance enhancement.
 
 ## About
@@ -14,11 +14,14 @@ To enable a quick search, I used an indexing method using a B-Tree. The specific
 
 <details> 
 <summary>index</summary>
+
 `"idx_offers_optimized_new_2" btree (outbounddepartureairport, countadults, countchildren, outbounddeparturedatetime, inboundarrivaldatetime, hotelid DESC)`
+
 </details>
 
 <details>
   <summary>offers table</summary>
+
 ```
                                  Table "public.offers_1"
           Column           |            Type             | Collation | Nullable | Default
@@ -46,7 +49,7 @@ Indexes:
 
 ### Backend
 
-Das Backend ist in Python mit FastAPI geschrieben. Es kann sich unter URL `http://localhost:xxxx/docs` die doku der Endpointe angeschaut werden.
+The backend is written in Python using FastAPI. The documentation of the endpoints can be viewed at the URL `http://localhost:xxxx/docs`.
 
 ### Cache
 
