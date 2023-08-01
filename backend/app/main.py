@@ -1,4 +1,5 @@
 from datetime import datetime, date
+import os
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
@@ -15,6 +16,13 @@ import redis
 models.Base.metadata.create_all(bind=engine)
 
 CACHE_TIME = 120*60 # min * sec = 2h
+
+REDIS_HOST = os.environ['REDIS_HOST']
+REDIS_PORT = os.environ['REDIS_PORT']
+REDIS_PASSWORD = os.environ['REDIS_PASSWORD']
+REDIS_USERNAME = os.environ['REDIS_USERNAME']
+
+
 
 
 app = FastAPI()
@@ -54,8 +62,8 @@ def welcome():
 
 @app.on_event("startup")
 async def startup():
-	redis_instance = redis.Redis(host='localhost', port=6379, username='default',
-								 password='jfhuez8f32fhfqnbef8g29hqnf024', decode_responses=False)
+	redis_instance = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, username=REDIS_USERNAME,
+								 password=REDIS_PASSWORD, decode_responses=False)
 	FastAPICache.init(RedisBackend(redis_instance), prefix="fastapi-cache")
 
 
