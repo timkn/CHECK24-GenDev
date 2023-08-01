@@ -1,7 +1,7 @@
 import openai
 import os
 
-openai.api_key = "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"
+openai.api_key = os.environ['OPENAI_API_KEY']
 
 
 def chat_gpt(input, train_data="") -> str:
