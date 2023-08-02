@@ -141,7 +141,7 @@ export function mapAirportNameToCode(name: string): string | undefined {
 export function getBadges(text: string) {
     text = text.toLowerCase()
 
-    let badges = []
+    const badges = []
 
     if ("sydney".indexOf(text) !== -1 || text.indexOf("sydney") !== -1) {
         badges.push({name: 'Sydney', color: 'blue', class: 'm-2'});
