@@ -8,13 +8,13 @@ def get_offers_from_hotel(db: Session, date_from: date, date_to: date, count_adu
 						  duration: int, hotelid: int):
 	SQL_OFFERS_FROM_HOTEL = f"""
 	select distinct *
-		FROM offers_1, hotels
+		FROM offers, hotels
 		where outbounddeparturedatetime >= :date_from
 		AND inboundarrivaldatetime <= :date_to
 		AND hotelid = :hotelid
 		AND countadults=:count_adults AND countchildren=:count_children
 		AND outbounddepartureairport=:airport
-		AND hotels.id = offers_1.hotelid
+		AND hotels.id = offers.hotelid
 		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = ':duration days';
 	"""
 	res = db.execute(text(SQL_OFFERS_FROM_HOTEL), {"date_from":date_from, "date_to":date_to, "hotelid":hotelid, "count_adults":count_adults, "count_children":count_children, "airport":airport, "duration":duration})
@@ -61,7 +61,7 @@ def get_offers_new(db: Session, date_from: date, date_to: date, count_adults: in
 			AND countadults=:count_adults AND countchildren=:count_children
 			AND outbounddepartureairport=:airport
 			AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval ':duration days'
-			and h.id = o.hotel_id
+			and h.id = o.hotelid
 			group by h.id
 			order by min;
 			"""
@@ -90,12 +90,12 @@ def get_offers(db: Session, date_from: date, date_to: date, count_adults: int, c
 			   duration: int):
 	sql = f"""
 		select distinct min(price) as min, *
-		FROM offers_1, hotels
+		FROM offers, hotels
 		where outbounddeparturedatetime >= '{date_from}'
 		AND inboundarrivaldatetime <= '{date_to}'
 		AND countadults={count_adults} AND countchildren={count_children}
 		AND outbounddepartureairport='{airport}'
-		and hotels.id = offers_1.hotelid
+		and hotels.id = offers.hotelid
 		AND date_trunc('day', inboundarrivaldatetime) - date_trunc('day', outbounddeparturedatetime) = interval '{duration} days'
 		group by hotelid, outbounddeparturedatetime, inbounddeparturedatetime, countadults, countchildren, price, inbounddepartureairport, outboundarrivalairport, inboundarrivaldatetime, outbounddepartureairport, inboundarrivalairport, outboundarrivaldatetime, mealtype, oceanview, roomtype, id, name, stars
 		order by min;
